@@ -27,7 +27,7 @@ function required(name: string): string {
 
 const admin = createClient<Database>(URL, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
 
-async function getOrCreateUser(email: string): Promise<string> {
+async function getOrCreateUser(email: string, fullName: string): Promise<string> {
   const { data: list, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (error) throw error;
   const existing = list.users.find((u) => u.email === email);
@@ -36,6 +36,7 @@ async function getOrCreateUser(email: string): Promise<string> {
     email,
     password: PASSWORD,
     email_confirm: true,
+    user_metadata: { full_name: fullName },
   });
   if (cErr || !data.user) throw new Error(`create user ${email}: ${cErr?.message}`);
   return data.user.id;
@@ -94,9 +95,9 @@ async function ensureMembership(orgId: string, userId: string, role: OrgRole): P
 async function main() {
   console.log("Seeding Airlock demo data…");
 
-  const acmeOwnerId = await getOrCreateUser("owner@acme.test");
-  const globexOwnerId = await getOrCreateUser("owner@globex.test");
-  const memberId = await getOrCreateUser("member@acme.test");
+  const acmeOwnerId = await getOrCreateUser("owner@acme.test", "Ada Lovelace");
+  const globexOwnerId = await getOrCreateUser("owner@globex.test", "Grace Hopper");
+  const memberId = await getOrCreateUser("member@acme.test", "Marvin Minsky");
 
   const acmeOrgId = await ensureOrg("owner@acme.test", "Acme Inc", "acme");
   const globexOrgId = await ensureOrg("owner@globex.test", "Globex Corp", "globex");

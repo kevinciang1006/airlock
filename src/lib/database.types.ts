@@ -100,8 +100,31 @@ export type Database = {
           },
         ];
       };
+      profiles: {
+        Row: {
+          id: string;
+          email: string | null;
+          full_name: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          email?: string | null;
+          full_name?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string | null;
+          full_name?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
-    Views: Record<string, never>;
+    Views: {
+      [_ in never]: never;
+    };
     Functions: {
       is_org_member: {
         Args: { target_org: string };
@@ -109,6 +132,10 @@ export type Database = {
       };
       has_org_role: {
         Args: { target_org: string; roles: OrgRole[] };
+        Returns: boolean;
+      };
+      shares_org: {
+        Args: { target_user: string };
         Returns: boolean;
       };
       create_organization: {
@@ -124,7 +151,9 @@ export type Database = {
     Enums: {
       org_role: OrgRole;
     };
-    CompositeTypes: Record<string, never>;
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
 };
 
@@ -132,3 +161,4 @@ export type Database = {
 export type Organization = Database["public"]["Tables"]["organizations"]["Row"];
 export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
 export type Project = Database["public"]["Tables"]["projects"]["Row"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
