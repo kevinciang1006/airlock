@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Airlock design tokens — light theme only. Ported from the design comp.
+   Accent is warm amber (#B25E09). No dark mode, no purple.
+   ========================================================================== */
+:root {
+  /* Font families (loaded via <link> in layout.tsx — see note there). */
+  --font-display: "Space Grotesk";
+  --font-sans: "Inter";
+  --font-mono: "IBM Plex Mono";
+
+  --paper: #fafbfc;
+  --surface: #ffffff;
+  --ink: #10192a;
+  --panel: #10192a;
+
+  --muted: #667085;
+  --label: #344054;
+  --mid: #475467;
+  --faint: #98a2b3;
+
+  --line: #e4e7ec;
+  --line-strong: #d0d5dd;
+  --line-strong-2: #c4cad3;
+
+  --bg-hover: #f9fafb;
+  --bg-track: #f2f4f7;
+  --bg-wash: #f6f7f9;
+  --bg-wash-2: #eef0f3;
+  --bg-wash-3: #edeff2;
+
+  --accent: #b25e09;
+  --accent-hover: #8f4b06;
+  --accent-bright: #e9a23b;
+  --accent-tint: #fbf4ec;
+  --accent-tint-2: #fbf0e4;
+  --accent-tint-border: #f0dfc9;
+  --accent-tint-fg: #7a5320;
+
+  --ok: #067647;
+  --ok-tint: #e7f4ec;
+  --warn: #b54708;
+  --warn-tint: #fdf3e7;
+  --danger: #b42318;
+  --danger-border: #fda29b;
+  --danger-tint: #fef3f2;
+  --danger-tint-2: #fceeea;
+  --info: #1257a0;
+  --info-tint: #eaf1fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-hover);
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--faint);
+  background-clip: content-box;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skeleton shimmer */
+.skel {
+  background: linear-gradient(90deg, #eef0f3 25%, #f6f7f9 37%, #eef0f3 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
