@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:'Inter',system-ui,sans-serif;color:#10192A;background:#FAFBFC;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.5}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:14px}
+  a{color:#B25E09;text-decoration:none}
+  a:hover{color:#8f4b06}
+  ::selection{background:#B25E09;color:#fff}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#D0D5DD;border-radius:8px;border:3px solid transparent;background-clip:content-box}
+  ::-webkit-scrollbar-thumb:hover{background:#98A2B3;background-clip:content-box}
+  *:focus-visible{outline:2px solid #B25E09;outline-offset:2px;border-radius:4px}
+  @keyframes reveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes slideright{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+  @keyframes toastin{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+  @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+  .reveal{animation:reveal .42s cubic-bezier(.16,1,.3,1)}
+  .skel{background:linear-gradient(90deg,#EEF0F3 25%,#F6F7F9 37%,#EEF0F3 63%);background-size:800px 100%;animation:shimmer 1.4s infinite linear;border-radius:6px}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important}}
+  @media (min-width:1000px){ [data-wide-panel]{display:flex!important} }
+  @media (max-width:900px){
+    [data-two-col]{grid-template-columns:1fr!important}
+    [data-plans]{grid-template-columns:1fr!important}
+    [data-board]{grid-template-columns:1fr!important}
+    [data-settings]{grid-template-columns:1fr!important}
+    [data-settings-nav]{flex-direction:row!important;overflow-x:auto;padding-bottom:6px}
+    [data-mobile-toggle]{display:flex!important}
+    aside[data-drawer]{position:fixed!important;left:0;top:0;height:100vh;z-index:70;transform:translateX(-100%);box-shadow:0 12px 40px rgba(16,25,42,.18)}
+    aside[data-drawer][data-open="true"]{transform:none}
+    [data-mobile-backdrop]{display:block!important}
+  }
+</style>
+</helmet>
+<div style="display:flex;height:100vh;width:100%;overflow:hidden;background:#FAFBFC">
+
+  <!-- ============ AUTH (full-screen, replaces app) ============ -->
+  <sc-if value="{{ isAuth }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;display:flex;background:#FAFBFC">
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:32px">
+        <div class="reveal" style="width:100%;max-width:400px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px">
+            <div style="width:32px;height:32px;border-radius:9px;background:#B25E09;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk';font-weight:700">A</div>
+            <span style="font-family:'Space Grotesk';font-weight:700;font-size:19px;letter-spacing:-.02em">Airlock</span>
+          </div>
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin-bottom:6px">{{ authTitle }}</div>
+          <div style="color:#667085;margin-bottom:26px">{{ authSub }}</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-if value="{{ authShowName }}" hint-placeholder-val="{{ false }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">Full name<input placeholder="Ada Lovelace" style="height:42px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px;background:#fff"></label>
+            </sc-if>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">Email<input value="ada@acme.com" style="height:42px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px;background:#fff"></label>
+            <sc-if value="{{ authShowPass }}" hint-placeholder-val="{{ false }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">Password<input type="password" value="············" style="height:42px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px;background:#fff"></label>
+            </sc-if>
+            <button onClick="{{ enterApp }}" style="height:44px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600;font-size:15px;margin-top:4px">{{ authCta }}</button>
+          </div>
+          <sc-if value="{{ authShowOauth }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="display:flex;align-items:center;gap:12px;margin:20px 0;color:#98A2B3;font-size:12px"><div style="flex:1;height:1px;background:#E4E7EC"></div>OR<div style="flex:1;height:1px;background:#E4E7EC"></div></div>
+              <button onClick="{{ enterApp }}" style="width:100%;height:44px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px"><span style="font-family:'Space Grotesk';font-weight:700;color:#4285F4">G</span> Continue with Google</button>
+              <button onClick="{{ enterApp }}" style="width:100%;height:44px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;margin-top:10px;color:#344054">Send magic link</button>
+            </div>
+          </sc-if>
+          <div style="margin-top:24px;font-size:13px;color:#667085;display:flex;gap:14px;flex-wrap:wrap">
+            <a onClick="{{ authGoSignup }}" style="cursor:pointer">Create account</a>
+            <a onClick="{{ authGoForgot }}" style="cursor:pointer">Forgot password?</a>
+            <a onClick="{{ authGoOnboard }}" style="cursor:pointer">Create organization</a>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;background:#10192A;display:none;color:#fff;padding:56px;flex-direction:column;justify-content:space-between" data-wide-panel>
+        <div style="font-family:'IBM Plex Mono';font-size:12px;color:#B0B7C3;letter-spacing:.04em">SECURE · MULTI-TENANT · RLS-ENFORCED</div>
+        <div>
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:34px;line-height:1.15;letter-spacing:-.02em;max-width:420px">One console. Every tenant, perfectly isolated.</div>
+          <div style="color:#98A2B3;margin-top:16px;max-width:400px;font-size:15px">Access control that's felt, not stated. Row-level security on every query, scoped to the org you're acting in.</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono';font-size:12px;color:#667085">acting in: <span style="color:#E9A23B">acme</span></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ SIDEBAR ============ -->
+  <sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
+  <div onClick="{{ closeMobileNav }}" data-mobile-backdrop data-open="{{ mobileNavOpen }}" style="display:none;position:fixed;inset:0;z-index:65;background:{{ backdropBg }};pointer-events:{{ backdropEvents }}"></div>
+  <aside data-drawer data-open="{{ mobileNavOpen }}" style="{{ sidebarStyle }}">
+    <!-- org switcher -->
+    <div style="padding:14px;border-bottom:1px solid #E4E7EC;position:relative">
+      <button onClick="{{ toggleOrgMenu }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px;background:{{ orgBtnBg }};border:1px solid #E4E7EC;border-radius:10px;text-align:left">
+        <div style="width:30px;height:30px;border-radius:8px;background:{{ activeOrg.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:13px;flex-shrink:0">{{ activeOrg.initials }}</div>
+        <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="min-width:0;flex:1">
+          <div style="font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ activeOrg.name }}</div>
+          <div style="font-family:'IBM Plex Mono';font-size:11px;color:#667085">{{ activeOrg.slug }}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#98A2B3" stroke-width="2"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg>
+        </sc-if>
+      </button>
+      <sc-if value="{{ orgMenu }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:14px;right:14px;top:64px;background:#fff;border:1px solid #E4E7EC;border-radius:12px;box-shadow:0 12px 32px rgba(16,25,42,.12);z-index:40;padding:6px;animation:pop .16s ease">
+        <div style="font-size:11px;font-weight:600;color:#98A2B3;padding:8px 8px 4px;letter-spacing:.03em">SWITCH ORGANIZATION</div>
+        <sc-for list="{{ orgList }}" as="o" hint-placeholder-count="4">
+          <button onClick="{{ o.select }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px;background:{{ o.rowBg }};border:none;border-radius:8px;text-align:left">
+            <div style="width:26px;height:26px;border-radius:7px;background:{{ o.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:11px">{{ o.initials }}</div>
+            <div style="flex:1;min-width:0"><div style="font-weight:500;font-size:13px">{{ o.name }}</div><div style="font-family:'IBM Plex Mono';font-size:10.5px;color:#667085">{{ o.slug }}</div></div>
+            <span style="font-family:'IBM Plex Mono';font-size:10px;color:#98A2B3">{{ o.role }}</span>
+          </button>
+        </sc-for>
+        <div style="height:1px;background:#E4E7EC;margin:6px 4px"></div>
+        <button onClick="{{ goOnboard }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 8px;background:none;border:none;border-radius:8px;text-align:left;color:#344054;font-weight:500;font-size:13px"><span style="width:26px;height:26px;border-radius:7px;border:1px dashed #C4CAD3;display:flex;align-items:center;justify-content:center;font-size:16px;color:#98A2B3">+</span> New organization</button>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- nav -->
+    <nav style="flex:1;overflow-y:auto;padding:12px 10px">
+      <div style="font-size:11px;font-weight:600;color:#98A2B3;padding:6px 10px;letter-spacing:.04em;{{ navLabelHide }}">WORKSPACE</div>
+      <sc-for list="{{ navMain }}" as="n" hint-placeholder-count="6">
+        <button onClick="{{ n.go }}" title="{{ n.label }}" style="{{ n.style }}">
+          <span style="display:flex;flex-shrink:0" data-icon="{{ n.icon }}">{{ n.iconEl }}</span>
+          <span style="flex:1;text-align:left;{{ navLabelHide }}">{{ n.label }}</span>
+          <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;background:#F2F4F7;color:#475467;border-radius:999px;padding:1px 7px;{{ navLabelHide }}">{{ n.badge }}</span></sc-if>
+        </button>
+      </sc-for>
+    </nav>
+
+    <!-- acting-in marker + collapse -->
+    <div style="padding:10px;border-top:1px solid #E4E7EC">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#FBF4EC;border:1px solid #F0DFC9;border-radius:9px;margin-bottom:8px;{{ navLabelHide }}">
+        <span style="width:7px;height:7px;border-radius:50%;background:#B25E09;box-shadow:0 0 0 3px rgba(178,94,9,.15)"></span>
+        <span style="font-size:11.5px;color:#7A5320">acting in <span style="font-family:'IBM Plex Mono';font-weight:600;color:#8f4b06">{{ activeOrg.slug }}</span></span>
+      </div>
+      <button onClick="{{ toggleSidebar }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;background:none;border:none;border-radius:8px;color:#667085;font-size:13px;font-weight:500">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;transform:{{ collapseIconRot }}"><path d="M13 5l-7 7 7 7"/><path d="M19 5l-7 7 7 7"/></svg>
+        <span style="{{ navLabelHide }}">Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN COLUMN ============ -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+    <!-- top bar -->
+    <header style="height:60px;flex-shrink:0;background:#fff;border-bottom:1px solid #E4E7EC;display:flex;align-items:center;gap:14px;padding:0 20px">
+      <button onClick="{{ toggleMobileNav }}" style="display:none;width:36px;height:36px;border:1px solid #E4E7EC;border-radius:9px;background:#fff;align-items:center;justify-content:center" data-mobile-toggle><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#344054" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <button onClick="{{ openCmdk }}" style="flex:1;max-width:440px;height:38px;display:flex;align-items:center;gap:10px;padding:0 12px;background:#F9FAFB;border:1px solid #E4E7EC;border-radius:9px;color:#98A2B3;font-size:13.5px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <span style="flex:1;text-align:left">Search or jump to…</span>
+        <span style="font-family:'IBM Plex Mono';font-size:11px;background:#fff;border:1px solid #E4E7EC;border-radius:5px;padding:2px 6px;color:#667085">⌘K</span>
+      </button>
+      <div style="flex:1"></div>
+      <button title="Help" style="width:38px;height:38px;border:1px solid #E4E7EC;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;color:#667085"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></button>
+      <div style="position:relative">
+        <button onClick="{{ toggleBell }}" title="Notifications" style="width:38px;height:38px;border:1px solid #E4E7EC;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;color:#667085;position:relative"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg><span style="position:absolute;top:7px;right:8px;width:7px;height:7px;background:#B42318;border-radius:50%;border:1.5px solid #fff"></span></button>
+        <sc-if value="{{ bell }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;right:0;top:46px;width:340px;background:#fff;border:1px solid #E4E7EC;border-radius:12px;box-shadow:0 12px 32px rgba(16,25,42,.14);z-index:40;overflow:hidden;animation:pop .16s ease">
+          <div style="padding:12px 14px;border-bottom:1px solid #E4E7EC;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600">Notifications</span><a style="font-size:12px;cursor:pointer">Mark all read</a></div>
+          <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="4">
+            <div style="padding:12px 14px;border-bottom:1px solid #F2F4F7;display:flex;gap:10px">
+              <span style="width:8px;height:8px;border-radius:50%;background:{{ nt.dot }};margin-top:5px;flex-shrink:0"></span>
+              <div><div style="font-size:13px;color:#10192A">{{ nt.text }}</div><div style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3;margin-top:2px">{{ nt.time }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+      <div style="width:1px;height:26px;background:#E4E7EC"></div>
+      <div style="position:relative">
+        <button onClick="{{ toggleAvatar }}" style="display:flex;align-items:center;gap:8px;background:none;border:none;padding:2px 4px 2px 2px;border-radius:9px">
+          <div style="width:32px;height:32px;border-radius:8px;background:#10192A;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:12px">AL</div>
+        </button>
+        <sc-if value="{{ avatarMenu }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;right:0;top:46px;width:230px;background:#fff;border:1px solid #E4E7EC;border-radius:12px;box-shadow:0 12px 32px rgba(16,25,42,.14);z-index:40;padding:6px;animation:pop .16s ease">
+          <div style="padding:10px 10px 12px"><div style="font-weight:600;font-size:13.5px">Ada Lovelace</div><div style="font-family:'IBM Plex Mono';font-size:11px;color:#667085">ada@acme.com</div></div>
+          <div style="height:1px;background:#E4E7EC;margin:0 4px 6px"></div>
+          <button onClick="{{ goProfile }}" style="width:100%;text-align:left;padding:8px 10px;background:none;border:none;border-radius:7px;font-size:13px;color:#344054">Profile settings</button>
+          <button onClick="{{ goSecurity }}" style="width:100%;text-align:left;padding:8px 10px;background:none;border:none;border-radius:7px;font-size:13px;color:#344054">Security</button>
+          <div style="height:1px;background:#E4E7EC;margin:6px 4px"></div>
+          <button onClick="{{ signOut }}" style="width:100%;text-align:left;padding:8px 10px;background:none;border:none;border-radius:7px;font-size:13px;color:#B42318">Sign out</button>
+        </div>
+        </sc-if>
+      </div>
+    </header>
+
+    <!-- breadcrumbs -->
+    <div style="height:40px;flex-shrink:0;background:#fff;border-bottom:1px solid #E4E7EC;display:flex;align-items:center;padding:0 24px;gap:8px;font-size:12.5px;color:#667085">
+      <span style="font-family:'IBM Plex Mono';color:#98A2B3">{{ activeOrg.slug }}</span>
+      <span style="color:#D0D5DD">/</span>
+      <span style="color:#10192A;font-weight:500">{{ crumb }}</span>
+    </div>
+
+    <!-- routed content -->
+    <main style="flex:1;overflow-y:auto;position:relative" data-scroll>
+      <div class="reveal" key="{{ route }}" style="padding:28px 24px 80px;max-width:1240px;margin:0 auto">
+
+        <!-- ===== OVERVIEW ===== -->
+        <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:22px">
+            <div>
+              <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;letter-spacing:-.02em">Overview</h1>
+              <p style="color:#667085;margin-top:4px">Everything happening in <span style="font-weight:500;color:#344054">{{ activeOrg.name }}</span> this week.</p>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button style="height:38px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Last 30 days ▾</button>
+              <button onClick="{{ openCreateProject }}" style="height:38px;padding:0 14px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600;display:flex;align-items:center;gap:7px"><span style="font-size:16px;line-height:0">+</span> New project</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-bottom:16px">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#667085;font-weight:500">{{ k.label }}</span><span style="font-size:11.5px;font-weight:600;color:{{ k.deltaColor }};background:{{ k.deltaBg }};padding:1px 7px;border-radius:999px">{{ k.delta }}</span></div>
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:30px;letter-spacing:-.02em;margin-top:8px">{{ k.value }}</div>
+                <svg viewBox="0 0 120 34" preserveAspectRatio="none" style="width:100%;height:34px;margin-top:8px"><path d="{{ k.sparkFill }}" fill="{{ k.sparkTint }}"></path><path d="{{ k.sparkLine }}" fill="none" stroke="{{ k.sparkStroke }}" stroke-width="2" vector-effect="non-scaling-stroke"></path></svg>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-bottom:16px" data-two-col>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div><div style="font-weight:600;font-size:15px">Requests over time</div><div style="font-size:12.5px;color:#667085;margin-top:2px">API requests across all projects</div></div><div style="font-family:'IBM Plex Mono';font-size:12px;color:#B25E09;font-weight:600">1.24M total</div></div>
+              <svg viewBox="0 0 620 200" preserveAspectRatio="none" style="width:100%;height:200px">
+                <line x1="0" y1="50" x2="620" y2="50" stroke="#F2F4F7"/><line x1="0" y1="100" x2="620" y2="100" stroke="#F2F4F7"/><line x1="0" y1="150" x2="620" y2="150" stroke="#F2F4F7"/>
+                <path d="{{ usageFill }}" fill="rgba(178,94,9,.08)"></path>
+                <path d="{{ usageLine }}" fill="none" stroke="#B25E09" stroke-width="2.5"></path>
+              </svg>
+              <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono';font-size:10.5px;color:#98A2B3;margin-top:6px"><span>Jun 8</span><span>Jun 15</span><span>Jun 22</span><span>Jun 29</span><span>Jul 6</span></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px">
+              <div style="font-weight:600;font-size:15px;margin-bottom:16px">Usage by project</div>
+              <sc-for list="{{ breakdown }}" as="b" hint-placeholder-count="5">
+                <div style="margin-bottom:13px">
+                  <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-family:'IBM Plex Mono';color:#344054">{{ b.slug }}</span><span style="color:#667085">{{ b.pct }}%</span></div>
+                  <div style="height:7px;background:#F2F4F7;border-radius:99px;overflow:hidden"><div style="height:100%;width:{{ b.pct }}%;background:{{ b.color }};border-radius:99px"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:16px" data-two-col>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden">
+              <div style="padding:16px 18px;border-bottom:1px solid #E4E7EC;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;font-size:15px">Recent activity</span><a onClick="{{ goAudit }}" style="font-size:12.5px;cursor:pointer">View audit log →</a></div>
+              <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+                <div style="padding:13px 18px;border-bottom:1px solid #F2F4F7;display:flex;gap:12px;align-items:center">
+                  <div style="width:30px;height:30px;border-radius:8px;background:{{ a.avBg }};color:{{ a.avFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:11px;flex-shrink:0">{{ a.initials }}</div>
+                  <div style="flex:1;min-width:0;font-size:13.5px"><span style="font-weight:500">{{ a.actor }}</span> <span style="color:#667085">{{ a.action }}</span> <span style="font-family:'IBM Plex Mono';font-size:12.5px;color:#B25E09">{{ a.target }}</span></div>
+                  <span style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3;flex-shrink:0">{{ a.time }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px">
+              <div style="font-weight:600;font-size:15px;margin-bottom:14px">Quick actions</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <button onClick="{{ openCreateProject }}" style="text-align:left;padding:12px 14px;background:#F9FAFB;border:1px solid #E4E7EC;border-radius:10px;display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:9px;background:#FBF4EC;color:#B25E09;display:flex;align-items:center;justify-content:center;font-size:18px">+</span><span><span style="font-weight:600;font-size:13.5px;display:block">New project</span><span style="font-size:12px;color:#667085">Spin up a workspace</span></span></button>
+                <button onClick="{{ openInvite }}" style="text-align:left;padding:12px 14px;background:#F9FAFB;border:1px solid #E4E7EC;border-radius:10px;display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:9px;background:#FBF4EC;color:#B25E09;display:flex;align-items:center;justify-content:center;font-size:18px">✦</span><span><span style="font-weight:600;font-size:13.5px;display:block">Invite teammate</span><span style="font-size:12px;color:#667085">Add a member by email</span></span></button>
+                <button onClick="{{ goSettings }}" style="text-align:left;padding:12px 14px;background:#F9FAFB;border:1px solid #E4E7EC;border-radius:10px;display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:9px;background:#FBF4EC;color:#B25E09;display:flex;align-items:center;justify-content:center;font-size:16px">⌗</span><span><span style="font-weight:600;font-size:13.5px;display:block">Generate API key</span><span style="font-size:12px;color:#667085">For programmatic access</span></span></button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== PROJECTS ===== -->
+        <sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+            <div><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;letter-spacing:-.02em">Projects</h1><p style="color:#667085;margin-top:4px">{{ projectCount }} projects in {{ activeOrg.name }}</p></div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="display:flex;background:#F2F4F7;border-radius:9px;padding:3px">
+                <button onClick="{{ setTableView }}" style="{{ tableTabStyle }}">Table</button>
+                <button onClick="{{ setBoardView }}" style="{{ boardTabStyle }}">Board</button>
+              </div>
+              <button onClick="{{ openCreateProject }}" style="height:38px;padding:0 14px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600;display:flex;align-items:center;gap:7px"><span style="font-size:16px;line-height:0">+</span> New project</button>
+            </div>
+          </div>
+
+          <!-- toolbar -->
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px;max-width:320px;height:38px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#fff;border:1px solid #E4E7EC;border-radius:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#98A2B3" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input value="{{ projectSearch }}" onInput="{{ onProjectSearch }}" placeholder="Search projects…" style="border:none;outline:none;flex:1;background:none"></div>
+            <sc-for list="{{ statusFilters }}" as="f" hint-placeholder-count="4">
+              <button onClick="{{ f.select }}" style="{{ f.style }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ isTableView }}" hint-placeholder-val="{{ true }}">
+            <!-- bulk bar -->
+            <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#FBF4EC;border:1px solid #F0DFC9;border-radius:10px;margin-bottom:12px;animation:reveal .2s ease"><span style="font-weight:600;font-size:13px;color:#7A5320">{{ selectionCount }} selected</span><button onClick="{{ bulkArchive }}" style="font-size:13px;padding:5px 11px;background:#fff;border:1px solid #E4E7EC;border-radius:7px;font-weight:500">Archive</button><button onClick="{{ bulkDelete }}" style="font-size:13px;padding:5px 11px;background:#fff;border:1px solid #FDA29B;color:#B42318;border-radius:7px;font-weight:500">Delete</button><button onClick="{{ clearSelection }}" style="margin-left:auto;font-size:13px;color:#7A5320;background:none;border:none">Clear</button></div>
+            </sc-if>
+
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden">
+              <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;min-width:720px">
+                <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E4E7EC">
+                  <th style="width:44px;padding:11px 0 11px 16px"><input type="checkbox" checked="{{ allSelected }}" onChange="{{ toggleSelectAll }}" style="width:15px;height:15px;accent-color:#B25E09"></th>
+                  <th onClick="{{ sortByName }}" style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em;cursor:pointer;user-select:none">PROJECT {{ sortNameArrow }}</th>
+                  <th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">STATUS</th>
+                  <th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">OWNER</th>
+                  <th style="text-align:right;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">REQUESTS</th>
+                  <th onClick="{{ sortByUpdated }}" style="text-align:right;padding:11px 16px 11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em;cursor:pointer;user-select:none">UPDATED {{ sortUpdatedArrow }}</th>
+                </tr></thead>
+                <tbody>
+                  <sc-for list="{{ pagedProjects }}" as="p" hint-placeholder-count="6">
+                    <tr onClick="{{ p.open }}" style="border-bottom:1px solid #F2F4F7;cursor:pointer;background:{{ p.rowBg }}">
+                      <td style="padding:12px 0 12px 16px" onClick="{{ p.stop }}"><input type="checkbox" checked="{{ p.selected }}" onChange="{{ p.toggle }}" style="width:15px;height:15px;accent-color:#B25E09"></td>
+                      <td style="padding:12px"><div style="font-weight:600;font-size:13.5px">{{ p.name }}</div><div style="font-family:'IBM Plex Mono';font-size:11.5px;color:#98A2B3">{{ p.slug }}</div></td>
+                      <td style="padding:12px"><span style="{{ p.statusStyle }}">{{ p.statusLabel }}</span></td>
+                      <td style="padding:12px"><div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:24px;border-radius:6px;background:{{ p.ownerBg }};color:{{ p.ownerFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:10px">{{ p.ownerInitials }}</div><span style="font-size:13px;color:#344054">{{ p.owner }}</span></div></td>
+                      <td style="padding:12px;text-align:right;font-family:'IBM Plex Mono';font-size:12.5px;color:#344054">{{ p.requests }}</td>
+                      <td style="padding:12px 16px 12px 12px;text-align:right;font-family:'IBM Plex Mono';font-size:12px;color:#98A2B3">{{ p.updated }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              </div>
+              <sc-if value="{{ noProjects }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:56px 20px;text-align:center"><div style="font-size:15px;font-weight:600;margin-bottom:6px">No projects match your filters</div><div style="color:#667085;margin-bottom:16px">Try clearing search or filters, or create a new project.</div><button onClick="{{ openCreateProject }}" style="height:38px;padding:0 16px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Create project</button></div>
+              </sc-if>
+              <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #F2F4F7">
+                <span style="font-size:12.5px;color:#667085">{{ pageInfo }}</span>
+                <div style="display:flex;gap:6px">
+                  <button onClick="{{ prevPage }}" style="height:32px;padding:0 12px;background:#fff;border:1px solid #E4E7EC;border-radius:7px;font-size:13px;color:#344054;font-weight:500">Prev</button>
+                  <button onClick="{{ nextPage }}" style="height:32px;padding:0 12px;background:#fff;border:1px solid #E4E7EC;border-radius:7px;font-size:13px;color:#344054;font-weight:500">Next</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isBoardView }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px" data-board>
+              <sc-for list="{{ boardColumns }}" as="col" hint-placeholder-count="3">
+                <div style="background:#F6F7F9;border:1px solid #EDEFF2;border-radius:12px;padding:12px">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:0 2px"><span style="width:8px;height:8px;border-radius:50%;background:{{ col.dot }}"></span><span style="font-weight:600;font-size:13.5px">{{ col.title }}</span><span style="font-size:12px;color:#98A2B3;font-family:'IBM Plex Mono'">{{ col.count }}</span></div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-for list="{{ col.cards }}" as="c" hint-placeholder-count="3">
+                      <div onClick="{{ c.open }}" style="background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:12px;cursor:pointer">
+                        <div style="font-weight:600;font-size:13.5px;margin-bottom:3px">{{ c.name }}</div>
+                        <div style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3;margin-bottom:10px">{{ c.slug }}</div>
+                        <div style="display:flex;align-items:center;justify-content:space-between"><div style="width:24px;height:24px;border-radius:6px;background:{{ c.ownerBg }};color:{{ c.ownerFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:10px">{{ c.ownerInitials }}</div><span style="font-family:'IBM Plex Mono';font-size:11px;color:#667085">{{ c.requests }}</span></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <!-- ===== PROJECT DETAIL ===== -->
+        <sc-if value="{{ isProjectDetail }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ goProjects }}" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:#667085;font-size:13px;font-weight:500;margin-bottom:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> All projects</button>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:18px">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="width:48px;height:48px;border-radius:12px;background:{{ detail.ownerBg }};color:{{ detail.ownerFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:17px">{{ detail.initials }}</div>
+              <div><div style="display:flex;align-items:center;gap:10px"><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:23px;letter-spacing:-.02em">{{ detail.name }}</h1><span style="{{ detail.statusStyle }}">{{ detail.statusLabel }}</span></div><div style="font-family:'IBM Plex Mono';font-size:12.5px;color:#98A2B3;margin-top:2px">{{ detail.slug }}</div></div>
+            </div>
+            <div style="display:flex;gap:10px"><button style="height:38px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Open dashboard</button><button style="height:38px;width:38px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;color:#667085">⋯</button></div>
+          </div>
+          <div style="display:flex;gap:2px;border-bottom:1px solid #E4E7EC;margin-bottom:22px">
+            <sc-for list="{{ detailTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+          </div>
+          <sc-if value="{{ detailTabOverview }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px">
+              <sc-for list="{{ detailStats }}" as="s" hint-placeholder-count="3"><div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:16px"><div style="font-size:12.5px;color:#667085">{{ s.label }}</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:24px;margin-top:6px">{{ s.value }}</div></div></sc-for>
+            </div>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px">
+              <div style="font-weight:600;font-size:15px;margin-bottom:16px">Metadata</div>
+              <sc-for list="{{ detailMeta }}" as="m" hint-placeholder-count="5"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F2F4F7"><span style="font-size:13px;color:#667085">{{ m.k }}</span><span style="font-family:'IBM Plex Mono';font-size:12.5px;color:#344054">{{ m.v }}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ detailTabAccess }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px"><div style="font-weight:600;font-size:15px;margin-bottom:4px">Who can access this project</div><div style="color:#667085;font-size:13px;margin-bottom:16px">Members inherit org roles unless overridden here.</div>
+              <sc-for list="{{ detailAccess }}" as="m" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F2F4F7"><div style="width:30px;height:30px;border-radius:8px;background:{{ m.avBg }};color:{{ m.avFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:11px">{{ m.initials }}</div><div style="flex:1"><div style="font-weight:500;font-size:13.5px">{{ m.name }}</div><div style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3">{{ m.email }}</div></div><span style="{{ m.roleStyle }}">{{ m.role }}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ detailTabActivity }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden"><sc-for list="{{ activity }}" as="a" hint-placeholder-count="5"><div style="padding:13px 18px;border-bottom:1px solid #F2F4F7;display:flex;gap:12px;align-items:center"><div style="width:30px;height:30px;border-radius:8px;background:{{ a.avBg }};color:{{ a.avFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:11px">{{ a.initials }}</div><div style="flex:1;font-size:13.5px"><span style="font-weight:500">{{ a.actor }}</span> <span style="color:#667085">{{ a.action }}</span> <span style="font-family:'IBM Plex Mono';font-size:12.5px;color:#B25E09">{{ a.target }}</span></div><span style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3">{{ a.time }}</span></div></sc-for></div>
+          </sc-if>
+          <sc-if value="{{ detailTabSettings }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px;margin-bottom:16px"><div style="font-weight:600;font-size:15px;margin-bottom:16px">Project settings</div><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054;max-width:420px;margin-bottom:14px">Display name<input value="{{ detail.name }}" style="height:40px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px"></label><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054;max-width:420px">Slug<input value="{{ detail.slug }}" style="height:40px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px;font-family:'IBM Plex Mono';font-size:13px"></label><div style="margin-top:16px"><button onClick="{{ toastSaved }}" style="height:38px;padding:0 16px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Save changes</button></div></div>
+            <div style="background:#fff;border:1px solid #FDA29B;border-radius:12px;padding:18px"><div style="font-weight:600;font-size:15px;color:#B42318;margin-bottom:4px">Danger zone</div><div style="color:#667085;font-size:13px;margin-bottom:16px">Deleting a project is permanent and removes all its data in <span style="font-family:'IBM Plex Mono'">{{ activeOrg.slug }}</span>.</div><button onClick="{{ openDeleteProject }}" style="height:38px;padding:0 16px;background:#fff;border:1px solid #FDA29B;color:#B42318;border-radius:9px;font-weight:600">Delete project</button></div>
+          </sc-if>
+        </sc-if>
+
+        <!-- ===== MEMBERS ===== -->
+        <sc-if value="{{ isMembers }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+            <div><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;letter-spacing:-.02em">Members</h1><p style="color:#667085;margin-top:4px">{{ memberCount }} people in {{ activeOrg.name }}</p></div>
+            <button onClick="{{ openInvite }}" style="height:38px;padding:0 14px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600;display:flex;align-items:center;gap:7px"><span style="font-size:16px;line-height:0">+</span> Invite member</button>
+          </div>
+          <div style="flex:1;min-width:200px;max-width:320px;height:38px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;margin-bottom:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#98A2B3" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input value="{{ memberSearch }}" onInput="{{ onMemberSearch }}" placeholder="Search members…" style="border:none;outline:none;flex:1;background:none"></div>
+          <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden;margin-bottom:22px">
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:680px">
+              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E4E7EC"><th style="text-align:left;padding:11px 16px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">MEMBER</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">ROLE</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">STATUS</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">LAST ACTIVE</th><th style="width:44px"></th></tr></thead>
+              <tbody><sc-for list="{{ filteredMembers }}" as="m" hint-placeholder-count="6">
+                <tr style="border-bottom:1px solid #F2F4F7">
+                  <td style="padding:12px 16px"><div style="display:flex;align-items:center;gap:11px"><div style="width:32px;height:32px;border-radius:8px;background:{{ m.avBg }};color:{{ m.avFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:11px">{{ m.initials }}</div><div><div style="font-weight:600;font-size:13.5px">{{ m.name }}</div><div style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3">{{ m.email }}</div></div></div></td>
+                  <td style="padding:12px"><span style="{{ m.roleStyle }}">{{ m.role }}</span></td>
+                  <td style="padding:12px"><span style="{{ m.statusStyle }}">{{ m.statusLabel }}</span></td>
+                  <td style="padding:12px;font-family:'IBM Plex Mono';font-size:12px;color:#667085">{{ m.lastActive }}</td>
+                  <td style="padding:12px"><button onClick="{{ m.remove }}" title="Remove" style="width:30px;height:30px;border:none;background:none;border-radius:7px;color:#98A2B3">⋯</button></td>
+                </tr>
+              </sc-for></tbody>
+            </table></div>
+          </div>
+
+          <!-- permissions matrix -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><h2 style="font-family:'Space Grotesk';font-weight:600;font-size:18px;letter-spacing:-.02em">Permissions matrix</h2><span style="font-size:12px;color:#667085">What each role can do in {{ activeOrg.name }}</span></div>
+          <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden">
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:560px">
+              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E4E7EC"><th style="text-align:left;padding:12px 16px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">CAPABILITY</th><th style="padding:12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em;width:120px">OWNER</th><th style="padding:12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em;width:120px">ADMIN</th><th style="padding:12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em;width:120px">MEMBER</th></tr></thead>
+              <tbody><sc-for list="{{ permissions }}" as="row" hint-placeholder-count="7">
+                <tr style="border-bottom:1px solid #F2F4F7"><td style="padding:12px 16px;font-size:13.5px;font-weight:500">{{ row.cap }}</td><td style="padding:12px;text-align:center" data-perm="{{ row.owner }}">{{ row.ownerEl }}</td><td style="padding:12px;text-align:center">{{ row.adminEl }}</td><td style="padding:12px;text-align:center">{{ row.memberEl }}</td></tr>
+              </sc-for></tbody>
+            </table></div>
+          </div>
+        </sc-if>
+
+        <!-- ===== USAGE / ANALYTICS ===== -->
+        <sc-if value="{{ isUsage }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+            <div><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;letter-spacing:-.02em">Usage</h1><p style="color:#667085;margin-top:4px">API activity across {{ activeOrg.name }}</p></div>
+            <div style="display:flex;gap:10px"><button style="height:38px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Jun 8 – Jul 6 ▾</button><button onClick="{{ toastExport }}" style="height:38px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Export CSV</button></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:16px">
+            <sc-for list="{{ usageStats }}" as="u" hint-placeholder-count="4"><div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:16px"><div style="font-size:12.5px;color:#667085">{{ u.label }}</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin-top:6px">{{ u.value }}</div><div style="font-size:12px;font-weight:600;color:{{ u.color }};margin-top:2px">{{ u.delta }}</div></div></sc-for>
+          </div>
+          <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px;margin-bottom:16px">
+            <div style="font-weight:600;font-size:15px;margin-bottom:16px">Requests over time</div>
+            <svg viewBox="0 0 900 220" preserveAspectRatio="none" style="width:100%;height:220px"><line x1="0" y1="55" x2="900" y2="55" stroke="#F2F4F7"/><line x1="0" y1="110" x2="900" y2="110" stroke="#F2F4F7"/><line x1="0" y1="165" x2="900" y2="165" stroke="#F2F4F7"/><path d="{{ usageFillWide }}" fill="rgba(178,94,9,.08)"></path><path d="{{ usageLineWide }}" fill="none" stroke="#B25E09" stroke-width="2.5"></path></svg>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" data-two-col>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px"><div style="font-weight:600;font-size:15px;margin-bottom:16px">Top projects by requests</div><sc-for list="{{ breakdown }}" as="b" hint-placeholder-count="5"><div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-family:'IBM Plex Mono';color:#344054">{{ b.slug }}</span><span style="color:#667085">{{ b.pct }}%</span></div><div style="height:7px;background:#F2F4F7;border-radius:99px;overflow:hidden"><div style="height:100%;width:{{ b.pct }}%;background:{{ b.color }};border-radius:99px"></div></div></div></sc-for></div>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:18px"><div style="font-weight:600;font-size:15px;margin-bottom:16px">Member activity (7d)</div><svg viewBox="0 0 400 180" preserveAspectRatio="none" style="width:100%;height:180px"><sc-for list="{{ activityBars }}" as="bar" hint-placeholder-count="7"><rect x="{{ bar.x }}" y="{{ bar.y }}" width="34" height="{{ bar.h }}" rx="4" fill="#1257A0"></rect></sc-for></svg><div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono';font-size:10.5px;color:#98A2B3;margin-top:6px"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div>
+          </div>
+        </sc-if>
+
+        <!-- ===== AUDIT LOG ===== -->
+        <sc-if value="{{ isAudit }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:20px"><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;letter-spacing:-.02em">Audit log</h1><p style="color:#667085;margin-top:4px">Every scoped action in <span style="font-family:'IBM Plex Mono';color:#344054">{{ activeOrg.slug }}</span>. Isolated per tenant.</p></div>
+          <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"><div style="flex:1;min-width:200px;max-width:300px;height:38px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#fff;border:1px solid #E4E7EC;border-radius:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#98A2B3" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input placeholder="Filter events…" style="border:none;outline:none;flex:1;background:none"></div><button style="height:38px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#475467">All actors ▾</button><button style="height:38px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#475467">All actions ▾</button></div>
+          <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden">
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:760px">
+              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E4E7EC"><th style="text-align:left;padding:11px 16px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">ACTOR</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">ACTION</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">RESOURCE</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">TENANT</th><th style="text-align:right;padding:11px 16px;font-size:11.5px;font-weight:600;color:#667085;letter-spacing:.03em">TIMESTAMP</th></tr></thead>
+              <tbody><sc-for list="{{ auditEvents }}" as="e" hint-placeholder-count="8">
+                <tr onClick="{{ e.open }}" style="border-bottom:1px solid #F2F4F7;cursor:pointer" style-hover="background:#F9FAFB">
+                  <td style="padding:12px 16px"><div style="display:flex;align-items:center;gap:9px"><div style="width:26px;height:26px;border-radius:7px;background:{{ e.avBg }};color:{{ e.avFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:10px">{{ e.initials }}</div><span style="font-size:13px;font-weight:500">{{ e.actor }}</span></div></td>
+                  <td style="padding:12px"><span style="{{ e.actionStyle }}">{{ e.action }}</span></td>
+                  <td style="padding:12px;font-family:'IBM Plex Mono';font-size:12px;color:#B25E09">{{ e.resource }}</td>
+                  <td style="padding:12px;font-family:'IBM Plex Mono';font-size:12px;color:#667085">{{ e.tenant }}</td>
+                  <td style="padding:12px 16px;text-align:right;font-family:'IBM Plex Mono';font-size:11.5px;color:#98A2B3">{{ e.ts }}</td>
+                </tr>
+              </sc-for></tbody>
+            </table></div>
+          </div>
+        </sc-if>
+
+        <!-- ===== BILLING ===== -->
+        <sc-if value="{{ isBilling }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:20px"><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;letter-spacing:-.02em">Billing & plans</h1><p style="color:#667085;margin-top:4px">Manage the {{ activeOrg.name }} subscription and invoices.</p></div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px" data-two-col>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:20px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px"><div><div style="font-size:12.5px;color:#667085">Current plan</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:22px;margin-top:3px">Scale <span style="font-size:13px;font-weight:500;color:#667085">· $499/mo</span></div></div><span style="background:#FBF4EC;color:#B25E09;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">Active</span></div>
+              <sc-for list="{{ usageLimits }}" as="l" hint-placeholder-count="3"><div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="color:#344054;font-weight:500">{{ l.label }}</span><span style="font-family:'IBM Plex Mono';color:#667085">{{ l.text }}</span></div><div style="height:8px;background:#F2F4F7;border-radius:99px;overflow:hidden"><div style="height:100%;width:{{ l.pct }}%;background:{{ l.color }};border-radius:99px"></div></div></div></sc-for>
+              <div style="display:flex;gap:10px;margin-top:18px"><button onClick="{{ toastUpgrade }}" style="height:38px;padding:0 16px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Upgrade plan</button><button style="height:38px;padding:0 16px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Manage</button></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:20px">
+              <div style="font-size:12.5px;color:#667085">Credit balance</div>
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:30px;letter-spacing:-.02em;margin-top:4px">24,800 <span style="font-size:14px;color:#667085;font-weight:500">credits</span></div>
+              <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F2F4F7"><div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0"><span style="color:#667085">Report generation</span><span style="font-family:'IBM Plex Mono'">−1,200</span></div><div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0"><span style="color:#667085">Fraud scoring</span><span style="font-family:'IBM Plex Mono'">−3,040</span></div><div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0"><span style="color:#667085">Monthly grant</span><span style="font-family:'IBM Plex Mono';color:#067647">+30,000</span></div></div>
+              <button onClick="{{ toastCredits }}" style="width:100%;height:38px;margin-top:14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Buy more credits</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px" data-plans>
+            <sc-for list="{{ plans }}" as="p" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid {{ p.border }};border-radius:12px;padding:20px;position:relative">
+                <sc-if value="{{ p.current }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:16px;right:16px;background:#FBF4EC;color:#B25E09;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600">Current</span></sc-if>
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:17px">{{ p.name }}</div>
+                <div style="margin:8px 0 14px"><span style="font-family:'Space Grotesk';font-weight:600;font-size:26px">{{ p.price }}</span><span style="color:#667085;font-size:13px">{{ p.per }}</span></div>
+                <sc-for list="{{ p.features }}" as="f" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:#344054"><span style="color:#067647;font-weight:700">✓</span>{{ f }}</div></sc-for>
+                <button onClick="{{ p.action }}" style="{{ p.btnStyle }}">{{ p.cta }}</button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden">
+            <div style="padding:16px 18px;border-bottom:1px solid #E4E7EC;font-weight:600;font-size:15px">Invoices</div>
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:560px">
+              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E4E7EC"><th style="text-align:left;padding:11px 18px;font-size:11.5px;font-weight:600;color:#667085">INVOICE</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085">DATE</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085">AMOUNT</th><th style="text-align:left;padding:11px 12px;font-size:11.5px;font-weight:600;color:#667085">STATUS</th><th style="width:60px"></th></tr></thead>
+              <tbody><sc-for list="{{ invoices }}" as="inv" hint-placeholder-count="5"><tr style="border-bottom:1px solid #F2F4F7"><td style="padding:12px 18px;font-family:'IBM Plex Mono';font-size:12.5px;color:#344054">{{ inv.id }}</td><td style="padding:12px;font-size:13px;color:#667085">{{ inv.date }}</td><td style="padding:12px;font-family:'IBM Plex Mono';font-size:12.5px">{{ inv.amount }}</td><td style="padding:12px"><span style="{{ inv.style }}">{{ inv.status }}</span></td><td style="padding:12px 18px;text-align:right"><a style="font-size:12.5px;cursor:pointer">PDF</a></td></tr></sc-for></tbody>
+            </table></div>
+          </div>
+        </sc-if>
+
+        <!-- ===== SETTINGS ===== -->
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:20px"><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;letter-spacing:-.02em">Settings</h1><p style="color:#667085;margin-top:4px">Configure {{ activeOrg.name }} and your account.</p></div>
+          <div style="display:grid;grid-template-columns:210px 1fr;gap:24px" data-settings>
+            <div style="display:flex;flex-direction:column;gap:2px" data-settings-nav>
+              <sc-for list="{{ settingsTabs }}" as="t" hint-placeholder-count="7"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+            </div>
+            <div style="min-width:0">
+              <!-- organization -->
+              <sc-if value="{{ setOrg }}" hint-placeholder-val="{{ true }}">
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:20px;margin-bottom:16px"><div style="font-weight:600;font-size:16px;margin-bottom:16px">Organization</div>
+                  <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><div style="width:52px;height:52px;border-radius:12px;background:{{ activeOrg.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:18px">{{ activeOrg.initials }}</div><button style="height:36px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Upload logo</button></div>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054;max-width:420px;margin-bottom:14px">Name<input value="{{ activeOrg.name }}" style="height:40px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054;max-width:420px">Slug<div style="display:flex;align-items:center;height:40px;border:1px solid #E4E7EC;border-radius:9px;overflow:hidden"><span style="font-family:'IBM Plex Mono';font-size:12px;color:#98A2B3;padding:0 4px 0 12px;background:#F9FAFB;height:100%;display:flex;align-items:center">airlock.app/</span><input value="{{ activeOrg.slug }}" style="flex:1;height:100%;border:none;font-family:'IBM Plex Mono';font-size:13px;padding:0 12px"></div></label>
+                  <div style="margin-top:18px"><button onClick="{{ toastSaved }}" style="height:38px;padding:0 16px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Save changes</button></div>
+                </div>
+                <div style="background:#fff;border:1px solid #FDA29B;border-radius:12px;padding:20px"><div style="font-weight:600;font-size:16px;color:#B42318;margin-bottom:4px">Delete organization</div><div style="color:#667085;font-size:13px;margin-bottom:16px">Permanently delete {{ activeOrg.name }}, all projects, members, and data. This cannot be undone.</div><button onClick="{{ openDeleteProject }}" style="height:38px;padding:0 16px;background:#fff;border:1px solid #FDA29B;color:#B42318;border-radius:9px;font-weight:600">Delete organization</button></div>
+              </sc-if>
+              <!-- profile -->
+              <sc-if value="{{ setProfile }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:20px"><div style="font-weight:600;font-size:16px;margin-bottom:16px">Profile</div>
+                  <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><div style="width:52px;height:52px;border-radius:12px;background:#10192A;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:16px">AL</div><button style="height:36px;padding:0 14px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Change avatar</button></div>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054;max-width:420px;margin-bottom:14px">Full name<input value="Ada Lovelace" style="height:40px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054;max-width:420px">Email<input value="ada@acme.com" style="height:40px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px;font-family:'IBM Plex Mono';font-size:13px"></label>
+                  <div style="margin-top:18px"><button onClick="{{ toastSaved }}" style="height:38px;padding:0 16px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Save profile</button></div>
+                </div>
+              </sc-if>
+              <!-- security -->
+              <sc-if value="{{ setSecurity }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:20px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600;font-size:16px">Two-factor authentication</div><div style="color:#667085;font-size:13px;margin-top:3px">Add a second step at sign-in with an authenticator app.</div></div><span style="background:#E7F4EC;color:#067647;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">Enabled</span></div></div>
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden"><div style="padding:16px 18px;border-bottom:1px solid #E4E7EC;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;font-size:16px">Active sessions</span><button onClick="{{ toastSessions }}" style="font-size:13px;padding:6px 12px;background:#fff;border:1px solid #E4E7EC;border-radius:8px;font-weight:500;color:#B42318">Sign out others</button></div>
+                  <sc-for list="{{ sessions }}" as="ss" hint-placeholder-count="3"><div style="padding:13px 18px;border-bottom:1px solid #F2F4F7;display:flex;align-items:center;gap:12px"><div style="flex:1"><div style="font-size:13.5px;font-weight:500">{{ ss.device }} <sc-if value="{{ ss.current }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#067647;font-weight:600">· this device</span></sc-if></div><div style="font-family:'IBM Plex Mono';font-size:11.5px;color:#98A2B3">{{ ss.meta }}</div></div><span style="font-family:'IBM Plex Mono';font-size:11.5px;color:#667085">{{ ss.time }}</span></div></sc-for>
+                </div>
+              </sc-if>
+              <!-- api keys -->
+              <sc-if value="{{ setApiKeys }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden"><div style="padding:16px 18px;border-bottom:1px solid #E4E7EC;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600;font-size:16px">API keys</div><div style="color:#667085;font-size:13px;margin-top:2px">Scoped to <span style="font-family:'IBM Plex Mono'">{{ activeOrg.slug }}</span>.</div></div><button onClick="{{ toastKeyGen }}" style="height:36px;padding:0 14px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Generate key</button></div>
+                  <sc-for list="{{ apiKeys }}" as="k" hint-placeholder-count="3"><div style="padding:14px 18px;border-bottom:1px solid #F2F4F7;display:flex;align-items:center;gap:14px"><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;margin-bottom:4px">{{ k.name }}</div><div style="display:flex;align-items:center;gap:8px"><code style="font-family:'IBM Plex Mono';font-size:12px;color:#667085;background:#F9FAFB;border:1px solid #EDEFF2;border-radius:6px;padding:3px 8px">{{ k.key }}</code><button onClick="{{ k.copy }}" title="Copy" style="width:26px;height:26px;border:1px solid #E4E7EC;border-radius:6px;background:#fff;color:#667085;font-size:11px">⧉</button></div></div><div style="text-align:right;font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3">{{ k.created }}</div><button onClick="{{ k.revoke }}" style="font-size:12.5px;padding:6px 11px;background:#fff;border:1px solid #FDA29B;color:#B42318;border-radius:8px;font-weight:500">Revoke</button></div></sc-for>
+                </div>
+              </sc-if>
+              <!-- webhooks -->
+              <sc-if value="{{ setWebhooks }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden"><div style="padding:16px 18px;border-bottom:1px solid #E4E7EC;display:flex;justify-content:space-between;align-items:center"><div style="font-weight:600;font-size:16px">Webhook endpoints</div><button onClick="{{ toastWebhook }}" style="height:36px;padding:0 14px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Add endpoint</button></div>
+                  <sc-for list="{{ webhooks }}" as="w" hint-placeholder-count="3"><div style="padding:14px 18px;border-bottom:1px solid #F2F4F7;display:flex;align-items:center;gap:12px"><span style="width:8px;height:8px;border-radius:50%;background:{{ w.dot }};flex-shrink:0"></span><div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono';font-size:12.5px;color:#344054;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ w.url }}</div><div style="font-size:11.5px;color:#98A2B3;margin-top:3px">{{ w.events }}</div></div><span style="font-family:'IBM Plex Mono';font-size:11px;color:#667085">{{ w.status }}</span></div></sc-for>
+                </div>
+              </sc-if>
+              <!-- notifications -->
+              <sc-if value="{{ setNotify }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;overflow:hidden"><div style="padding:16px 18px;border-bottom:1px solid #E4E7EC;font-weight:600;font-size:16px">Notification preferences</div>
+                  <sc-for list="{{ notifyPrefs }}" as="n" hint-placeholder-count="4"><div style="padding:14px 18px;border-bottom:1px solid #F2F4F7;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13.5px;font-weight:500">{{ n.label }}</div><div style="font-size:12.5px;color:#667085;margin-top:2px">{{ n.desc }}</div></div><button onClick="{{ n.toggle }}" style="width:42px;height:24px;border-radius:99px;border:none;background:{{ n.trackBg }};position:relative;flex-shrink:0"><span style="position:absolute;top:2px;left:{{ n.knobLeft }};width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .16s"></span></button></div></sc-for>
+                </div>
+              </sc-if>
+              <!-- sso -->
+              <sc-if value="{{ setSso }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:20px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div style="font-weight:600;font-size:16px">Enterprise SSO</div><span style="background:#F2F4F7;color:#475467;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">Not configured</span></div><div style="color:#667085;font-size:13px;margin-bottom:18px;max-width:480px">Connect SAML 2.0 and SCIM to let your identity provider manage sign-in and provisioning for {{ activeOrg.name }}.</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px" data-two-col><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">SSO URL<input placeholder="https://idp.example.com/sso" style="height:40px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px;font-family:'IBM Plex Mono';font-size:12.5px"></label><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">Entity ID<input placeholder="airlock-acme" style="height:40px;padding:0 12px;border:1px solid #E4E7EC;border-radius:9px;font-family:'IBM Plex Mono';font-size:12.5px"></label></div>
+                  <button onClick="{{ toastSso }}" style="height:38px;padding:0 16px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Configure SSO</button>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </main>
+  </div>
+  </sc-if>
+
+  <!-- ============ COMMAND PALETTE ============ -->
+  <sc-if value="{{ cmdk }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeCmdk }}" style="position:fixed;inset:0;z-index:90;background:rgba(16,25,42,.35);backdrop-filter:blur(2px);display:flex;justify-content:center;align-items:flex-start;padding-top:12vh;animation:fadein .12s ease">
+      <div onClick="{{ stopProp }}" style="width:100%;max-width:600px;background:#fff;border:1px solid #E4E7EC;border-radius:14px;box-shadow:0 24px 60px rgba(16,25,42,.28);overflow:hidden;animation:pop .16s ease">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid #E4E7EC"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#98A2B3" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input autofocus value="{{ cmdkQuery }}" onInput="{{ onCmdkInput }}" placeholder="Search orgs, projects, members, settings…" style="flex:1;border:none;outline:none;font-size:16px"><span style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3;border:1px solid #E4E7EC;border-radius:5px;padding:2px 6px">ESC</span></div>
+        <div style="max-height:52vh;overflow-y:auto;padding:8px">
+          <sc-for list="{{ cmdkGroups }}" as="g" hint-placeholder-count="3">
+            <div style="padding:8px 10px 4px;font-size:11px;font-weight:600;color:#98A2B3;letter-spacing:.04em">{{ g.label }}</div>
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+              <button onClick="{{ it.run }}" style="width:100%;display:flex;align-items:center;gap:12px;padding:10px;background:none;border:none;border-radius:9px;text-align:left" style-hover="background:#F6F7F9">
+                <span style="width:30px;height:30px;border-radius:8px;background:{{ it.iconBg }};color:{{ it.iconFg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:11px;flex-shrink:0">{{ it.icon }}</span>
+                <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:500">{{ it.label }}</div><div style="font-family:'IBM Plex Mono';font-size:11px;color:#98A2B3">{{ it.sub }}</div></div>
+                <span style="font-size:11px;color:#C4CAD3">↵</span>
+              </button>
+            </sc-for>
+          </sc-for>
+          <sc-if value="{{ cmdkEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:34px;text-align:center;color:#98A2B3;font-size:13.5px">No results for “{{ cmdkQuery }}”</div></sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ MODALS ============ -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:80;background:rgba(16,25,42,.4);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:24px;animation:fadein .12s ease">
+      <div onClick="{{ stopProp }}" style="width:100%;max-width:{{ modalWidth }};background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(16,25,42,.28);overflow:hidden;animation:pop .18s ease">
+        <!-- create project -->
+        <sc-if value="{{ modalCreateProject }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:22px 24px 0"><div style="font-family:'Space Grotesk';font-weight:600;font-size:19px;letter-spacing:-.02em">Create project</div><div style="color:#667085;font-size:13.5px;margin-top:4px">A new isolated workspace in <span style="font-family:'IBM Plex Mono'">{{ activeOrg.slug }}</span>.</div></div>
+          <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">Project name<input value="{{ createName }}" onInput="{{ onCreateName }}" placeholder="Payments Gateway" style="height:42px;padding:0 12px;border:1px solid {{ createNameBorder }};border-radius:9px"><sc-if value="{{ createNameError }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#B42318">Project name is required.</span></sc-if></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">Slug<div style="display:flex;align-items:center;height:42px;border:1px solid #E4E7EC;border-radius:9px;overflow:hidden;background:#F9FAFB"><span style="font-family:'IBM Plex Mono';font-size:12.5px;color:#98A2B3;padding:0 4px 0 12px">{{ activeOrg.slug }}/</span><input value="{{ createSlug }}" readonly style="flex:1;height:100%;border:none;background:#fff;font-family:'IBM Plex Mono';font-size:13px;padding:0 12px"></div></label>
+          </div>
+          <div style="padding:16px 24px;background:#F9FAFB;border-top:1px solid #E4E7EC;display:flex;justify-content:flex-end;gap:10px"><button onClick="{{ closeModal }}" style="height:40px;padding:0 16px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Cancel</button><button onClick="{{ submitCreateProject }}" style="height:40px;padding:0 18px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Create project</button></div>
+        </sc-if>
+        <!-- invite -->
+        <sc-if value="{{ modalInvite }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:22px 24px 0"><div style="font-family:'Space Grotesk';font-weight:600;font-size:19px;letter-spacing:-.02em">Invite member</div><div style="color:#667085;font-size:13.5px;margin-top:4px">They'll get access scoped to <span style="font-family:'IBM Plex Mono'">{{ activeOrg.slug }}</span>.</div></div>
+          <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#344054">Email address<input value="{{ inviteEmail }}" onInput="{{ onInviteEmail }}" placeholder="teammate@company.com" style="height:42px;padding:0 12px;border:1px solid {{ inviteEmailBorder }};border-radius:9px"><sc-if value="{{ inviteEmailError }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#B42318">Enter a valid email address.</span></sc-if></label>
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:500;color:#344054">Role</span><div style="display:flex;gap:8px"><sc-for list="{{ inviteRoles }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.select }}" style="{{ r.style }}">{{ r.label }}</button></sc-for></div></div>
+          </div>
+          <div style="padding:16px 24px;background:#F9FAFB;border-top:1px solid #E4E7EC;display:flex;justify-content:flex-end;gap:10px"><button onClick="{{ closeModal }}" style="height:40px;padding:0 16px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Cancel</button><button onClick="{{ submitInvite }}" style="height:40px;padding:0 18px;background:#B25E09;color:#fff;border:none;border-radius:9px;font-weight:600">Send invite</button></div>
+        </sc-if>
+        <!-- confirm (remove member / delete project) -->
+        <sc-if value="{{ modalConfirm }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px">
+            <div style="display:flex;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#FEF3F2;color:#B42318;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9l-8 14A2 2 0 004 21h16a2 2 0 001.7-3l-8-14a2 2 0 00-3.4 0z"/></svg></div><div style="flex:1"><div style="font-family:'Space Grotesk';font-weight:600;font-size:18px;letter-spacing:-.02em">{{ confirmTitle }}</div><div style="color:#667085;font-size:13.5px;margin-top:5px">{{ confirmBody }}</div><div style="margin-top:12px;padding:10px 12px;background:#FBF4EC;border:1px solid #F0DFC9;border-radius:9px;font-size:12.5px;color:#7A5320;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#B25E09"></span>acting in <span style="font-family:'IBM Plex Mono';font-weight:600">{{ activeOrg.slug }}</span></div></div></div>
+          </div>
+          <div style="padding:16px 24px;background:#F9FAFB;border-top:1px solid #E4E7EC;display:flex;justify-content:flex-end;gap:10px"><button onClick="{{ closeModal }}" style="height:40px;padding:0 16px;background:#fff;border:1px solid #E4E7EC;border-radius:9px;font-weight:500;color:#344054">Cancel</button><button onClick="{{ submitConfirm }}" style="height:40px;padding:0 18px;background:#B42318;color:#fff;border:none;border-radius:9px;font-weight:600">{{ confirmCta }}</button></div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ TOASTS ============ -->
+  <div style="position:fixed;right:20px;bottom:20px;z-index:120;display:flex;flex-direction:column;gap:10px;pointer-events:none">
+    <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+      <div style="min-width:280px;max-width:360px;background:#fff;border:1px solid #E4E7EC;border-left:3px solid {{ t.accent }};border-radius:10px;box-shadow:0 10px 30px rgba(16,25,42,.16);padding:13px 15px;display:flex;align-items:center;gap:11px;animation:toastin .22s cubic-bezier(.16,1,.3,1);pointer-events:auto">
+        <span style="width:22px;height:22px;border-radius:50%;background:{{ t.iconBg }};color:{{ t.iconFg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">{{ t.icon }}</span>
+        <span style="flex:1;font-size:13.5px;font-weight:500">{{ t.title }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    route: 'overview', view: 'app', authView: 'signin',
+    activeOrg: 0, orgMenu: false, sidebarCollapsed: false, mobileNav: false,
+    bell: false, avatarMenu: false,
+    projectsView: 'table', projectSearch: '', projectStatus: 'all',
+    sortKey: 'updated', sortDir: 'desc', selected: {}, page: 1,
+    selectedProject: null, projectTab: 'overview',
+    memberSearch: '', settingsTab: 'organization',
+    modal: null, cmdk: false, cmdkQuery: '',
+    createName: '', createTouched: false, inviteEmail: '', inviteTouched: false, inviteRole: 'member',
+    confirmKind: null, confirmName: '',
+    notify: { deploys:true, usage:true, invites:false, security:true },
+    toasts: []
+  };
+
+  orgs = [
+    { name: 'Acme Inc', slug: 'acme', role: 'owner', initials: 'AC', color: '#B25E09', plan: 'Scale' },
+    { name: 'Globex Corp', slug: 'globex', role: 'admin', initials: 'GX', color: '#1257A0', plan: 'Growth' },
+    { name: 'Initech', slug: 'initech', role: 'member', initials: 'IN', color: '#067647', plan: 'Starter' },
+    { name: 'Umbrella Labs', slug: 'umbrella-labs', role: 'owner', initials: 'UL', color: '#344054', plan: 'Enterprise' }
+  ];
+
+  avatarPalette = [['#FBF4EC','#B25E09'],['#EAF1FB','#1257A0'],['#E7F4EC','#067647'],['#F2F4F7','#475467'],['#FCEEEA','#B42318']];
+  av(i){ return this.avatarPalette[i % this.avatarPalette.length]; }
+
+  projects = [
+    { name: 'Payments Gateway', slug: 'acme/payments-gateway', status: 'active', owner: 'Ada Lovelace', oi: 0, requests: 428910, updated: '2h ago', u: 2 },
+    { name: 'Fraud Detection', slug: 'acme/fraud-detection', status: 'active', owner: 'Grace Hopper', oi: 1, requests: 312044, updated: '5h ago', u: 5 },
+    { name: 'Customer Portal', slug: 'acme/customer-portal', status: 'active', owner: 'Alan Turing', oi: 2, requests: 198320, updated: 'Yesterday', u: 26 },
+    { name: 'Notifications Svc', slug: 'acme/notifications', status: 'paused', owner: 'Katherine J.', oi: 3, requests: 88210, updated: '2d ago', u: 48 },
+    { name: 'Data Warehouse', slug: 'acme/data-warehouse', status: 'active', owner: 'Ada Lovelace', oi: 0, requests: 156700, updated: '3d ago', u: 72 },
+    { name: 'Mobile API', slug: 'acme/mobile-api', status: 'active', owner: 'Grace Hopper', oi: 1, requests: 274500, updated: '4d ago', u: 96 },
+    { name: 'Legacy Billing', slug: 'acme/legacy-billing', status: 'archived', owner: 'Alan Turing', oi: 2, requests: 4120, updated: '3w ago', u: 500 },
+    { name: 'Search Indexer', slug: 'acme/search-indexer', status: 'active', owner: 'Katherine J.', oi: 3, requests: 91230, updated: '6d ago', u: 144 },
+    { name: 'Auth Service', slug: 'acme/auth-service', status: 'active', owner: 'Ada Lovelace', oi: 0, requests: 512300, updated: '1w ago', u: 168 },
+    { name: 'Reporting Engine', slug: 'acme/reporting', status: 'paused', owner: 'Grace Hopper', oi: 1, requests: 33400, updated: '2w ago', u: 336 },
+    { name: 'Webhook Relay', slug: 'acme/webhook-relay', status: 'active', owner: 'Alan Turing', oi: 2, requests: 67800, updated: '2w ago', u: 340 },
+    { name: 'Sandbox', slug: 'acme/sandbox', status: 'archived', owner: 'Katherine J.', oi: 3, requests: 210, updated: '1mo ago', u: 720 }
+  ];
+
+  members = [
+    { name: 'Ada Lovelace', email: 'ada@acme.com', role: 'owner', status: 'active', lastActive: '2m ago', i: 0 },
+    { name: 'Grace Hopper', email: 'grace@acme.com', role: 'admin', status: 'active', lastActive: '18m ago', i: 1 },
+    { name: 'Alan Turing', email: 'alan@acme.com', role: 'admin', status: 'active', lastActive: '1h ago', i: 2 },
+    { name: 'Katherine Johnson', email: 'katherine@acme.com', role: 'member', status: 'active', lastActive: '3h ago', i: 3 },
+    { name: 'Edsger Dijkstra', email: 'edsger@acme.com', role: 'member', status: 'active', lastActive: 'Yesterday', i: 4 },
+    { name: 'Barbara Liskov', email: 'barbara@acme.com', role: 'member', status: 'invited', lastActive: '—', i: 0 },
+    { name: 'Donald Knuth', email: 'don@acme.com', role: 'member', status: 'invited', lastActive: '—', i: 1 },
+    { name: 'Margaret Hamilton', email: 'margaret@acme.com', role: 'admin', status: 'active', lastActive: '2d ago', i: 2 }
+  ];
+
+  activity = [
+    { actor: 'Grace Hopper', action: 'deployed', target: 'acme/fraud-detection', time: '2m ago', i: 1 },
+    { actor: 'Ada Lovelace', action: 'rotated API key for', target: 'acme/payments-gateway', time: '1h ago', i: 0 },
+    { actor: 'Alan Turing', action: 'invited', target: 'barbara@acme.com', time: '3h ago', i: 2 },
+    { actor: 'Katherine Johnson', action: 'paused', target: 'acme/notifications', time: '5h ago', i: 3 },
+    { actor: 'Margaret Hamilton', action: 'updated billing plan to', target: 'Scale', time: 'Yesterday', i: 2 }
+  ];
+
+  notifications = [
+    { text: 'Grace Hopper deployed fraud-detection', time: '2m ago', dot: '#067647' },
+    { text: 'API usage at 62% of monthly limit', time: '1h ago', dot: '#B54708' },
+    { text: 'Barbara Liskov accepted your invite', time: '3h ago', dot: '#B25E09' },
+    { text: 'Invoice INV-2048 was paid', time: 'Yesterday', dot: '#98A2B3' }
+  ];
+
+  permissions = [
+    { cap: 'View projects & usage', o: 1, a: 1, m: 1 },
+    { cap: 'Create & edit projects', o: 1, a: 1, m: 1 },
+    { cap: 'Delete projects', o: 1, a: 1, m: 0 },
+    { cap: 'Invite & manage members', o: 1, a: 1, m: 0 },
+    { cap: 'Manage roles & permissions', o: 1, a: 0, m: 0 },
+    { cap: 'Manage billing & plan', o: 1, a: 0, m: 0 },
+    { cap: 'Rotate API keys & secrets', o: 1, a: 1, m: 0 },
+    { cap: 'Delete organization', o: 1, a: 0, m: 0 }
+  ];
+
+  usagePoints = [42,48,45,52,60,58,66,72,70,78,85,82,90,96,92,101,110,108,118,124,120,132,140,138,150,158,152,168,176,182];
+  activityData = [120,145,132,168,155,72,48];
+
+  auditEvents = [
+    { actor:'Grace Hopper', i:1, action:'deploy', resource:'acme/fraud-detection', ts:'Jul 6 · 14:22:08' },
+    { actor:'Ada Lovelace', i:0, action:'key.rotate', resource:'key_9fA2c1', ts:'Jul 6 · 13:04:51' },
+    { actor:'Alan Turing', i:2, action:'member.invite', resource:'barbara@acme.com', ts:'Jul 6 · 11:47:33' },
+    { actor:'Katherine Johnson', i:3, action:'project.pause', resource:'acme/notifications', ts:'Jul 5 · 18:12:09' },
+    { actor:'Margaret Hamilton', i:2, action:'billing.update', resource:'plan:scale', ts:'Jul 5 · 09:38:44' },
+    { actor:'Ada Lovelace', i:0, action:'member.role', resource:'grace@acme.com', ts:'Jul 4 · 16:20:11' },
+    { actor:'Grace Hopper', i:1, action:'project.create', resource:'acme/search-indexer', ts:'Jul 4 · 10:05:27' },
+    { actor:'Edsger Dijkstra', i:4, action:'login', resource:'session_2c8', ts:'Jul 3 · 22:41:03' }
+  ];
+  sessions = [
+    { device:'MacBook Pro · Chrome', meta:'San Francisco, US · 73.2.14.9', time:'now', current:true },
+    { device:'iPhone 15 · Safari', meta:'San Francisco, US · 73.2.14.9', time:'2h ago', current:false },
+    { device:'Linux · Firefox', meta:'New York, US · 12.44.6.2', time:'Yesterday', current:false }
+  ];
+  apiKeys = [
+    { name:'Production', key:'sk_live_9fA2c1••••••••4d7e', created:'Created Mar 14' },
+    { name:'CI / Staging', key:'sk_test_2b71d••••••••9a0c', created:'Created May 02' },
+    { name:'Analytics (read)', key:'sk_live_c48f0••••••••1e63', created:'Created Jun 21' }
+  ];
+  webhooks = [
+    { url:'https://hooks.acme.com/airlock/events', events:'project.*, member.invite', status:'live', dot:'#067647' },
+    { url:'https://ops.acme.com/ingest/audit', events:'audit.*', status:'live', dot:'#067647' },
+    { url:'https://staging.acme.com/wh/test', events:'project.deploy', status:'paused', dot:'#B54708' }
+  ];
+  plans = [
+    { name:'Starter', price:'$0', per:'/mo', features:['3 projects','5 members','Community support','7-day audit log'], cta:'Downgrade', current:false },
+    { name:'Growth', price:'$149', per:'/mo', features:['25 projects','25 members','Email support','30-day audit log'], cta:'Choose Growth', current:false },
+    { name:'Scale', price:'$499', per:'/mo', features:['Unlimited projects','Unlimited members','Priority support','1-year audit log'], cta:'Current plan', current:true }
+  ];
+  invoices = [
+    { id:'INV-2048', date:'Jul 1, 2026', amount:'$499.00', status:'paid' },
+    { id:'INV-2039', date:'Jun 1, 2026', amount:'$499.00', status:'paid' },
+    { id:'INV-2031', date:'May 1, 2026', amount:'$499.00', status:'paid' },
+    { id:'INV-2024', date:'Apr 1, 2026', amount:'$149.00', status:'paid' },
+    { id:'INV-2017', date:'Mar 1, 2026', amount:'$149.00', status:'refunded' }
+  ];
+
+  get org(){ return this.orgs[this.state.activeOrg]; }
+
+  // ---- chart helpers ----
+  spark(vals, w, h){ const mn=Math.min(...vals), mx=Math.max(...vals), r=(mx-mn)||1, st=w/(vals.length-1);
+    const pts=vals.map((v,i)=>[+(i*st).toFixed(1), +(h-3-((v-mn)/r)*(h-6)).toFixed(1)]);
+    const line='M'+pts.map(p=>p[0]+' '+p[1]).join(' L');
+    return { line, fill: line+` L${w} ${h} L0 ${h} Z` }; }
+
+  // ---- lifecycle ----
+  componentDidMount(){ this._k=(e)=>{
+      if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); this.setState(s=>({cmdk:!s.cmdk, cmdkQuery:''})); }
+      else if(e.key==='Escape'){ this.setState({cmdk:false, modal:null, orgMenu:false, bell:false, avatarMenu:false}); }
+    }; window.addEventListener('keydown', this._k); }
+  componentWillUnmount(){ window.removeEventListener('keydown', this._k); }
+
+  // ---- nav ----
+  go = (r) => this.setState({ route: r, mobileNav:false, cmdk:false, avatarMenu:false, orgMenu:false, bell:false, selectedProject: r==='projects'?null:this.state.selectedProject });
+  toggleOrgMenu = () => this.setState(s=>({orgMenu:!s.orgMenu}));
+  toggleSidebar = () => this.setState(s=>({sidebarCollapsed:!s.sidebarCollapsed}));
+  toggleMobileNav = () => this.setState(s=>({mobileNav:!s.mobileNav}));
+  toggleBell = () => this.setState(s=>({bell:!s.bell, avatarMenu:false}));
+  toggleAvatar = () => this.setState(s=>({avatarMenu:!s.avatarMenu, bell:false}));
+  selectOrg = (i) => { this.setState({activeOrg:i, orgMenu:false}); this.toast('info', 'Switched to '+this.orgs[i].name); };
+  signOut = () => this.setState({view:'auth', authView:'signin', avatarMenu:false});
+  enterApp = () => this.setState({view:'app', route:'overview'});
+
+  toast = (type, title) => { const id=Date.now()+Math.random();
+    this.setState(s=>({toasts:[...s.toasts,{id,type,title}]}));
+    setTimeout(()=>this.setState(s=>({toasts:s.toasts.filter(t=>t.id!==id)})), 3200); };
+  toastSaved = () => this.toast('success','Changes saved');
+
+  // ---- command palette ----
+  openCmdk = () => this.setState({cmdk:true, cmdkQuery:''});
+  closeCmdk = () => this.setState({cmdk:false});
+  onCmdkInput = (e) => this.setState({cmdkQuery:e.target.value});
+
+  // ---- projects ----
+  setTableView = () => this.setState({projectsView:'table'});
+  setBoardView = () => this.setState({projectsView:'board'});
+  onProjectSearch = (e) => this.setState({projectSearch:e.target.value, page:1});
+  setStatus = (s) => this.setState({projectStatus:s, page:1});
+  sortBy = (k) => this.setState(st=>({sortKey:k, sortDir: st.sortKey===k && st.sortDir==='asc' ? 'desc':'asc'}));
+  toggleRow = (slug) => this.setState(s=>({selected:{...s.selected,[slug]:!s.selected[slug]}}));
+  prevPage = () => this.setState(s=>({page:Math.max(1,s.page-1)}));
+  nextPage = () => this.setState(s=>({page:s.page+1}));
+  openProject = (slug) => this.setState({selectedProject:slug, route:'projectDetail', projectTab:'overview'});
+  setProjectTab = (t) => this.setState({projectTab:t});
+  clearSelection = () => this.setState({selected:{}});
+  bulkArchive = () => { this.clearSelection(); this.toast('success','Projects archived'); };
+  bulkDelete = () => { this.clearSelection(); this.toast('success','Projects deleted'); };
+
+  // ---- modals ----
+  openCreateProject = () => this.setState({modal:'createProject', createName:'', createTouched:false, orgMenu:false, avatarMenu:false});
+  openInvite = () => this.setState({modal:'invite', inviteEmail:'', inviteTouched:false, inviteRole:'member'});
+  openDeleteProject = () => this.setState({modal:'confirm', confirmKind:'deleteProject'});
+  openRemoveMember = (name) => this.setState({modal:'confirm', confirmKind:'removeMember', confirmName:name});
+  closeModal = () => this.setState({modal:null});
+  onCreateName = (e) => this.setState({createName:e.target.value, createTouched:true});
+  submitCreateProject = () => { if(!this.state.createName.trim()){ this.setState({createTouched:true}); return; } this.setState({modal:null}); this.toast('success','Project created'); };
+  onInviteEmail = (e) => this.setState({inviteEmail:e.target.value, inviteTouched:true});
+  setInviteRole = (r) => this.setState({inviteRole:r});
+  submitInvite = () => { const ok=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this.state.inviteEmail); if(!ok){ this.setState({inviteTouched:true}); return; } this.setState({modal:null}); this.toast('success','Invitation sent'); };
+  submitConfirm = () => { const k=this.state.confirmKind; this.setState({modal:null}); this.toast('success', k==='deleteProject'?'Project deleted': (this.state.confirmName+' removed')); if(k==='deleteProject') this.setState({route:'projects', selectedProject:null}); };
+
+  onMemberSearch = (e) => this.setState({memberSearch:e.target.value});
+  setSettingsTab = (t) => this.setState({settingsTab:t});
+  stopProp = (e) => e.stopPropagation();
+  toggleNotify = (k) => this.setState(s=>({notify:{...s.notify,[k]:!s.notify[k]}}));
+  copyKey = () => this.toast('success','API key copied');
+  revokeKey = (n) => this.toast('success',n+' key revoked');
+  openAuditEvent = (id) => this.toast('info','Event '+id+' opened');
+
+  badge(kind){
+    const map = {
+      active:['#E7F4EC','#067647','Active'], paused:['#FBF0E4','#B54708','Paused'], archived:['#F2F4F7','#667085','Archived'],
+      invited:['#FBF0E4','#B54708','Invited'],
+      owner:['#FBF4EC','#B25E09','Owner'], admin:['#EAF1FB','#1257A0','Admin'], member:['#F2F4F7','#475467','Member']
+    };
+    const b=map[kind]||['#F2F4F7','#475467',kind];
+    return { style:`display:inline-block;background:${b[0]};color:${b[1]};padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;text-transform:capitalize`, label:b[2] };
+  }
+  check(on){ return on
+    ? React.createElement('span',{style:{display:'inline-flex',width:'22px',height:'22px',borderRadius:'6px',background:'#E7F4EC',color:'#067647',alignItems:'center',justifyContent:'center',fontWeight:700}}, '✓')
+    : React.createElement('span',{style:{display:'inline-flex',width:'22px',height:'22px',borderRadius:'6px',background:'#F5F6F8',color:'#C4CAD3',alignItems:'center',justifyContent:'center'}}, '–'); }
+
+  icon(name){
+    const p={
+      overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+      projects:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v5"/>',
+      members:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0"/><path d="M16 6a3 3 0 010 6"/><path d="M15 20a6 6 0 00-1-3.5"/>',
+      usage:'<rect x="4" y="12" width="3.5" height="8" rx="1"/><rect x="10.2" y="7" width="3.5" height="13" rx="1"/><rect x="16.5" y="4" width="3.5" height="16" rx="1"/>',
+      audit:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+      billing:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>',
+      settings:'<circle cx="7" cy="7" r="2"/><path d="M11 7h9M4 7h1"/><circle cx="15" cy="14" r="2"/><path d="M4 14h9M19 14h1"/>'
+    };
+    return React.createElement('svg',{width:19,height:19,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round',strokeLinejoin:'round',dangerouslySetInnerHTML:{__html:p[name]||''}});
+  }
+
+  renderVals(){
+    const s = this.state, org = this.org;
+    const inApp = s.view === 'app';
+    const collapsed = s.sidebarCollapsed;
+    const routeCrumb = { overview:'Overview', projects:'Projects', projectDetail:'Projects', members:'Members', usage:'Usage', audit:'Audit log', settings:'Settings', billing:'Billing' };
+
+    // sidebar
+    const sidebarBase = 'display:flex;flex-direction:column;background:#fff;border-right:1px solid #E4E7EC;flex-shrink:0;transition:width .2s ease;';
+    const sidebarStyle = sidebarBase + (collapsed ? 'width:72px' : 'width:248px');
+    const navLabelHide = collapsed ? 'display:none' : '';
+
+    const navDefs = [
+      { key:'overview', label:'Overview', icon:'overview' },
+      { key:'projects', label:'Projects', icon:'projects', badge:String(this.projects.length) },
+      { key:'members', label:'Members', icon:'members', badge:String(this.members.length) },
+      { key:'usage', label:'Usage', icon:'usage' },
+      { key:'audit', label:'Audit log', icon:'audit' },
+      { key:'billing', label:'Billing', icon:'billing' },
+      { key:'settings', label:'Settings', icon:'settings' }
+    ];
+    const activeKey = s.route==='projectDetail' ? 'projects' : s.route;
+    const navMain = navDefs.map(n=>{
+      const on = n.key===activeKey;
+      const base = 'width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border:none;border-radius:9px;font-size:13.5px;font-weight:'+(on?'600':'500')+';margin-bottom:2px;'+(collapsed?'justify-content:center;':'');
+      return { label:n.label, icon:n.icon, iconEl:this.icon(n.icon), badge:n.badge,
+        style: base + (on ? 'background:#FBF4EC;color:#B25E09' : 'background:none;color:#475467'),
+        go: () => this.go(n.key) };
+    });
+
+    const orgList = this.orgs.map((o,i)=>({ ...o, rowBg: i===s.activeOrg?'#F9FAFB':'transparent', select:()=>this.selectOrg(i) }));
+
+    // ---- projects filter/sort ----
+    let ps = this.projects.slice();
+    if(s.projectStatus!=='all') ps = ps.filter(p=>p.status===s.projectStatus);
+    const q = s.projectSearch.trim().toLowerCase();
+    if(q) ps = ps.filter(p=>p.name.toLowerCase().includes(q)||p.slug.includes(q));
+    ps.sort((a,b)=>{ let r; if(s.sortKey==='name') r=a.name.localeCompare(b.name); else r=a.u-b.u; return s.sortDir==='asc'?r:-r; });
+    const pageSize=6, totalPages=Math.max(1,Math.ceil(ps.length/pageSize));
+    const page=Math.min(s.page,totalPages);
+    const paged = ps.slice((page-1)*pageSize, page*pageSize);
+    const mapProject = (p)=>{ const sb=this.badge(p.status), ov=this.av(p.oi);
+      return { name:p.name, slug:p.slug, statusStyle:sb.style, statusLabel:sb.label,
+        owner:p.owner, ownerInitials:p.owner.split(' ').map(x=>x[0]).join(''), ownerBg:ov[0], ownerFg:ov[1],
+        requests:p.requests.toLocaleString(), updated:p.updated,
+        selected:!!s.selected[p.slug], rowBg:s.selected[p.slug]?'#FCFAF7':'#fff',
+        open:()=>this.openProject(p.slug), toggle:()=>this.toggleRow(p.slug), stop:(e)=>e.stopPropagation() }; };
+    const pagedProjects = paged.map(mapProject);
+
+    const statusDefs=[['all','All'],['active','Active'],['paused','Paused'],['archived','Archived']];
+    const statusFilters = statusDefs.map(([k,l])=>{ const on=s.projectStatus===k;
+      return { label:l, select:()=>this.setStatus(k),
+        style:'height:38px;padding:0 14px;border-radius:9px;font-size:13px;font-weight:500;border:1px solid '+(on?'#B25E09':'#E4E7EC')+';background:'+(on?'#FBF4EC':'#fff')+';color:'+(on?'#B25E09':'#475467') }; });
+
+    // board
+    const byStatus=(st)=>this.projects.filter(p=>p.status===st).map(mapProject);
+    const boardColumns=[
+      { title:'Active', dot:'#067647', cards:byStatus('active') },
+      { title:'Paused', dot:'#B54708', cards:byStatus('paused') },
+      { title:'Archived', dot:'#98A2B3', cards:byStatus('archived') }
+    ].map(c=>({...c, count:c.cards.length}));
+
+    const selCount = Object.values(s.selected).filter(Boolean).length;
+    const allSel = paged.length>0 && paged.every(p=>s.selected[p.slug]);
+    const tableTab='height:32px;padding:0 14px;border:none;border-radius:7px;font-size:13px;font-weight:600;';
+    const arrow=(k)=> s.sortKey!==k?'':(s.sortDir==='asc'?'↑':'↓');
+
+    // ---- project detail ----
+    const dp = this.projects.find(p=>p.slug===s.selectedProject) || this.projects[0];
+    const dpb=this.badge(dp.status), dov=this.av(dp.oi);
+    const detail = { name:dp.name, slug:dp.slug, initials:dp.name.split(' ').map(x=>x[0]).join('').slice(0,2),
+      statusStyle:dpb.style, statusLabel:dpb.label, ownerBg:dov[0], ownerFg:dov[1] };
+    const dtabs=[['overview','Overview'],['activity','Activity'],['access','Access'],['settings','Settings']];
+    const detailTabs=dtabs.map(([k,l])=>{ const on=s.projectTab===k;
+      return { label:l, select:()=>this.setProjectTab(k),
+        style:'padding:10px 14px;background:none;border:none;border-bottom:2px solid '+(on?'#B25E09':'transparent')+';color:'+(on?'#B25E09':'#667085')+';font-weight:'+(on?'600':'500')+';font-size:13.5px;margin-bottom:-1px' }; });
+    const detailStats=[{label:'Requests (30d)',value:dp.requests.toLocaleString()},{label:'Members with access',value:'6'},{label:'Uptime',value:'99.98%'}];
+    const detailMeta=[{k:'Project ID',v:'prj_'+dp.slug.split('/')[1].replace(/-/g,'').slice(0,10)},{k:'Slug',v:dp.slug},{k:'Region',v:'us-east-1'},{k:'Created',v:'Mar 14, 2026'},{k:'Owner',v:dp.owner}];
+    const detailAccess=this.members.slice(0,4).map(m=>{ const av=this.av(m.i), rb=this.badge(m.role);
+      return { name:m.name, email:m.email, initials:m.name.split(' ').map(x=>x[0]).join(''), avBg:av[0], avFg:av[1], role:rb.label, roleStyle:rb.style }; });
+
+    // ---- members ----
+    const mq=s.memberSearch.trim().toLowerCase();
+    let ms=this.members.slice();
+    if(mq) ms=ms.filter(m=>m.name.toLowerCase().includes(mq)||m.email.toLowerCase().includes(mq));
+    const filteredMembers=ms.map(m=>{ const av=this.av(m.i), rb=this.badge(m.role), sb=this.badge(m.status);
+      return { name:m.name, email:m.email, initials:m.name.split(' ').map(x=>x[0]).join(''), avBg:av[0], avFg:av[1],
+        role:rb.label, roleStyle:rb.style, statusStyle:sb.style, statusLabel:sb.label, lastActive:m.lastActive,
+        remove:()=>this.openRemoveMember(m.name) }; });
+    const permissions=this.permissions.map(r=>({ cap:r.cap, ownerEl:this.check(r.o), adminEl:this.check(r.a), memberEl:this.check(r.m) }));
+
+    // ---- overview KPIs ----
+    const kpiDefs=[
+      { label:'Projects', value:'48', delta:'+6', up:true, data:[30,32,31,35,38,40,42,44,43,46,48] },
+      { label:'Members', value:'26', delta:'+3', up:true, data:[18,19,19,20,22,22,23,24,24,25,26] },
+      { label:'Requests (mo)', value:'1.24M', delta:'+18%', up:true, data:[70,78,82,90,96,104,112,120,130,138,150] },
+      { label:'Active this week', value:'19', delta:'−2', up:false, data:[22,21,23,20,21,19,20,18,19,20,19] }
+    ];
+    const kpis=kpiDefs.map(k=>{ const sp=this.spark(k.data,120,34); const pos=k.up;
+      return { label:k.label, value:k.value, delta:k.delta,
+        deltaColor: pos?'#067647':'#B54708', deltaBg: pos?'#E7F4EC':'#FBF0E4',
+        sparkLine:sp.line, sparkFill:sp.fill, sparkStroke: pos?'#067647':'#B54708', sparkTint: pos?'rgba(6,118,71,.08)':'rgba(181,71,8,.08)' }; });
+
+    const usg=this.spark(this.usagePoints,620,190);
+    const breakdown=[
+      { slug:'auth-service', pct:34, color:'#B25E09' },
+      { slug:'payments-gateway', pct:26, color:'#1257A0' },
+      { slug:'mobile-api', pct:18, color:'#067647' },
+      { slug:'fraud-detection', pct:14, color:'#B54708' },
+      { slug:'other', pct:8, color:'#98A2B3' }
+    ];
+    const activity=this.activity.map(a=>{ const av=this.av(a.i);
+      return { actor:a.actor, action:a.action, target:a.target, time:a.time,
+        initials:a.actor.split(' ').map(x=>x[0]).join(''), avBg:av[0], avFg:av[1] }; });
+
+    // ---- command palette ----
+    const cq=s.cmdkQuery.trim().toLowerCase();
+    const nav=[['overview','Overview','Dashboard'],['projects','Projects','All projects'],['members','Members','People & roles'],['usage','Usage','Analytics'],['audit','Audit log','Event history'],['settings','Settings','Org & profile'],['billing','Billing','Plan & invoices']];
+    const mk=(label,sub,icon,ib,ifg,run)=>({label,sub,icon,iconBg:ib,iconFg:ifg,run});
+    let gNav=nav.filter(n=>!cq||n[1].toLowerCase().includes(cq)).map(n=>mk(n[1],n[2],'→','#F2F4F7','#475467',()=>this.go(n[0])));
+    let gProj=this.projects.filter(p=>!cq||p.name.toLowerCase().includes(cq)||p.slug.includes(cq)).slice(0,4).map(p=>mk(p.name,p.slug,'▣','#FBF4EC','#B25E09',()=>this.openProject(p.slug)));
+    let gMem=this.members.filter(m=>!cq||m.name.toLowerCase().includes(cq)||m.email.includes(cq)).slice(0,3).map(m=>mk(m.name,m.email,m.name.split(' ').map(x=>x[0]).join(''),'#EAF1FB','#1257A0',()=>this.go('members')));
+    let gOrg=this.orgs.filter(o=>!cq||o.name.toLowerCase().includes(cq)||o.slug.includes(cq)).map((o,i)=>mk('Switch to '+o.name,o.slug,o.initials,'#F2F4F7','#475467',()=>this.selectOrg(this.orgs.indexOf(o))));
+    const cmdkGroups=[
+      {label:'NAVIGATION', items:gNav}, {label:'PROJECTS', items:gProj}, {label:'MEMBERS', items:gMem}, {label:'ORGANIZATIONS', items:gOrg}
+    ].filter(g=>g.items.length);
+    const cmdkEmpty = cmdkGroups.length===0;
+
+    // ---- invite roles ----
+    const inviteRoles=[['member','Member'],['admin','Admin'],['owner','Owner']].map(([k,l])=>{ const on=s.inviteRole===k;
+      return { label:l, select:()=>this.setInviteRole(k),
+        style:'flex:1;height:40px;border-radius:9px;font-size:13px;font-weight:500;border:1px solid '+(on?'#B25E09':'#E4E7EC')+';background:'+(on?'#FBF4EC':'#fff')+';color:'+(on?'#B25E09':'#475467') }; });
+
+    // ---- confirm modal ----
+    const confirmMap={ deleteProject:{title:'Delete this project?', body:'This permanently deletes '+detail.name+' and all its data. This cannot be undone.', cta:'Delete project'},
+      removeMember:{title:'Remove member?', body:'This revokes '+s.confirmName+"'s access to this organization immediately.", cta:'Remove member'} };
+    const cm=confirmMap[s.confirmKind]||{title:'',body:'',cta:'Confirm'};
+
+    // ---- toasts ----
+    const toastStyle={ success:['#067647','#E7F4EC','#067647','✓'], error:['#B42318','#FEF3F2','#B42318','!'], info:['#1257A0','#EAF1FB','#1257A0','i'] };
+    const toasts=s.toasts.map(t=>{ const ts=toastStyle[t.type]||toastStyle.info;
+      return { title:t.title, accent:ts[0], iconBg:ts[1], iconFg:ts[2], icon:ts[3] }; });
+
+    // ---- usage screen ----
+    const usgW=this.spark(this.usagePoints,900,210);
+    const usageStats=[
+      { label:'Total requests', value:'1.24M', delta:'+18% vs last period', color:'#067647' },
+      { label:'Avg latency', value:'82ms', delta:'−4ms vs last period', color:'#067647' },
+      { label:'Error rate', value:'0.34%', delta:'+0.05% vs last period', color:'#B54708' },
+      { label:'Peak RPS', value:'2,140', delta:'+220 vs last period', color:'#067647' }
+    ];
+    const amx=Math.max(...this.activityData);
+    const activityBars=this.activityData.map((v,i)=>{ const h=Math.round((v/amx)*150); return { x:14+i*54, y:180-h, h }; });
+
+    // ---- audit ----
+    const actionTint={ deploy:['#E7F4EC','#067647'], login:['#EAF1FB','#1257A0'] };
+    const auditEvents=this.auditEvents.map(e=>{ const av=this.av(e.i); const dngr=/delete|revoke|pause/.test(e.action);
+      const at = actionTint[e.action] || (dngr?['#FBF0E4','#B54708']:['#F2F4F7','#475467']);
+      return { actor:e.actor, initials:e.actor.split(' ').map(x=>x[0]).join(''), avBg:av[0], avFg:av[1],
+        action:e.action, actionStyle:'font-family:\'IBM Plex Mono\';font-size:11.5px;font-weight:600;background:'+at[0]+';color:'+at[1]+';padding:2px 8px;border-radius:6px',
+        resource:e.resource, tenant:this.org.slug, ts:e.ts, open:()=>this.openAuditEvent(e.resource) }; });
+
+    // ---- billing ----
+    const usageLimits=[
+      { label:'API requests', text:'1.24M / 2M', pct:62, color:'#B25E09' },
+      { label:'Projects', text:'12 / unlimited', pct:24, color:'#067647' },
+      { label:'Members', text:'8 / unlimited', pct:16, color:'#067647' }
+    ];
+    const plans=this.plans.map(p=>({ ...p, border:p.current?'#B25E09':'#E4E7EC',
+      action:()=> p.current?null:this.toast('success','Switched to '+p.name),
+      btnStyle:'width:100%;height:38px;margin-top:16px;border-radius:9px;font-weight:600;font-size:13px;border:1px solid '+(p.current?'#E4E7EC':'#B25E09')+';background:'+(p.current?'#F9FAFB':'#B25E09')+';color:'+(p.current?'#98A2B3':'#fff') }));
+    const invStatus={ paid:['#E7F4EC','#067647','Paid'], refunded:['#F2F4F7','#667085','Refunded'], due:['#FBF0E4','#B54708','Due'] };
+    const invoices=this.invoices.map(iv=>{ const st=invStatus[iv.status]||invStatus.paid;
+      return { id:iv.id, date:iv.date, amount:iv.amount, status:st[2], style:'background:'+st[0]+';color:'+st[1]+';padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600' }; });
+
+    // ---- settings ----
+    const stabs=[['organization','Organization'],['profile','Profile'],['security','Security'],['apikeys','API keys'],['webhooks','Webhooks'],['notifications','Notifications'],['sso','Enterprise SSO']];
+    const settingsTabs=stabs.map(([k,l])=>{ const on=s.settingsTab===k;
+      return { label:l, select:()=>this.setSettingsTab(k),
+        style:'text-align:left;padding:9px 12px;border:none;border-radius:9px;font-size:13.5px;font-weight:'+(on?'600':'500')+';background:'+(on?'#FBF4EC':'none')+';color:'+(on?'#B25E09':'#475467') }; });
+    const apiKeys=this.apiKeys.map(k=>({ ...k, copy:this.copyKey, revoke:()=>this.revokeKey(k.name) }));
+    const notifyLabels={ deploys:['Deployments','When a project is deployed or rolled back'], usage:['Usage alerts','When usage crosses 80% of a plan limit'], invites:['Member invites','When a teammate accepts or declines an invite'], security:['Security events','Sign-ins from new devices and key rotations'] };
+    const notifyPrefs=Object.keys(notifyLabels).map(k=>{ const on=s.notify[k];
+      return { label:notifyLabels[k][0], desc:notifyLabels[k][1], toggle:()=>this.toggleNotify(k),
+        trackBg:on?'#B25E09':'#D0D5DD', knobLeft:on?'20px':'2px' }; });
+
+    // ---- auth ----
+    const authMap={ signin:{title:'Sign in to Airlock', sub:'Enter your credentials to continue.', cta:'Sign in', name:false, pass:true, oauth:true},
+      signup:{title:'Create your account', sub:'Start managing tenants in minutes.', cta:'Create account', name:true, pass:true, oauth:true},
+      forgot:{title:'Reset your password', sub:"We'll email you a reset link.", cta:'Send reset link', name:false, pass:false, oauth:false} };
+    const am=authMap[s.authView]||authMap.signin;
+
+    return {
+      inApp, isAuth: !inApp,
+      authView:s.authView, authTitle:am.title, authSub:am.sub, authCta:am.cta, authShowName:am.name, authShowPass:am.pass, authShowOauth:am.oauth,
+      authGoSignup:()=>this.setState({authView:'signup'}), authGoForgot:()=>this.setState({authView:'forgot'}), authGoOnboard:()=>{ this.setState({view:'app', route:'settings', settingsTab:'organization'}); },
+      enterApp:this.enterApp, signOut:this.signOut,
+
+      route:s.route, crumb: routeCrumb[s.route]||'Overview',
+      isOverview:s.route==='overview', isProjects:s.route==='projects', isProjectDetail:s.route==='projectDetail',
+      isMembers:s.route==='members', isUsage:s.route==='usage', isAudit:s.route==='audit', isSettings:s.route==='settings', isBilling:s.route==='billing',
+
+      sidebarStyle, navLabelHide, sidebarOpen:!collapsed, collapseIconRot: collapsed?'rotate(180deg)':'none',
+      mobileNavOpen: s.mobileNav?'true':'false', closeMobileNav:()=>this.setState({mobileNav:false}),
+      backdropBg: s.mobileNav?'rgba(16,25,42,.4)':'transparent', backdropEvents: s.mobileNav?'auto':'none',
+      activeOrg:org, orgMenu:s.orgMenu, orgBtnBg:s.orgMenu?'#F9FAFB':'#fff', orgList, navMain,
+      toggleOrgMenu:this.toggleOrgMenu, toggleSidebar:this.toggleSidebar, toggleMobileNav:this.toggleMobileNav,
+      goOnboard:()=>{ this.setState({orgMenu:false, route:'settings', settingsTab:'organization'}); },
+
+      bell:s.bell, avatarMenu:s.avatarMenu, toggleBell:this.toggleBell, toggleAvatar:this.toggleAvatar, notifications:this.notifications,
+      openCmdk:this.openCmdk, goProfile:()=>{this.setState({avatarMenu:false, settingsTab:'profile'}); this.go('settings');}, goSecurity:()=>{this.setState({avatarMenu:false, settingsTab:'security'}); this.go('settings');},
+
+      kpis, usageLine:usg.line, usageFill:usg.fill, breakdown, activity,
+      openCreateProject:this.openCreateProject, openInvite:this.openInvite,
+      goProjects:()=>this.go('projects'), goSettings:()=>{this.setState({settingsTab:'apikeys'}); this.go('settings');}, goAudit:()=>this.go('audit'),
+
+      projectCount:ps.length, projectSearch:s.projectSearch, onProjectSearch:this.onProjectSearch,
+      isTableView:s.projectsView==='table', isBoardView:s.projectsView==='board',
+      tableTabStyle:tableTab+(s.projectsView==='table'?'background:#fff;color:#10192A;box-shadow:0 1px 2px rgba(16,25,42,.08)':'background:none;color:#667085'),
+      boardTabStyle:tableTab+(s.projectsView==='board'?'background:#fff;color:#10192A;box-shadow:0 1px 2px rgba(16,25,42,.08)':'background:none;color:#667085'),
+      setTableView:this.setTableView, setBoardView:this.setBoardView, statusFilters,
+      pagedProjects, boardColumns, noProjects: paged.length===0,
+      allSelected:allSel, toggleSelectAll:()=>{ const ns={...s.selected}; const target=!allSel; paged.forEach(p=>ns[p.slug]=target); this.setState({selected:ns}); },
+      sortByName:()=>this.sortBy('name'), sortByUpdated:()=>this.sortBy('updated'), sortNameArrow:arrow('name'), sortUpdatedArrow:arrow('updated'),
+      hasSelection:selCount>0, selectionCount:selCount, clearSelection:this.clearSelection, bulkArchive:this.bulkArchive, bulkDelete:this.bulkDelete,
+      prevPage:this.prevPage, nextPage:this.nextPage, pageInfo:'Showing '+((page-1)*pageSize+1)+'–'+Math.min(page*pageSize,ps.length)+' of '+ps.length,
+
+      detail, detailTabs, detailStats, detailMeta, detailAccess,
+      detailTabOverview:s.projectTab==='overview', detailTabActivity:s.projectTab==='activity', detailTabAccess:s.projectTab==='access', detailTabSettings:s.projectTab==='settings',
+      openDeleteProject:this.openDeleteProject, toastSaved:this.toastSaved,
+
+      memberCount:this.members.length, memberSearch:s.memberSearch, onMemberSearch:this.onMemberSearch, filteredMembers, permissions,
+
+      cmdk:s.cmdk, cmdkQuery:s.cmdkQuery, onCmdkInput:this.onCmdkInput, closeCmdk:this.closeCmdk, cmdkGroups, cmdkEmpty, stopProp:this.stopProp,
+
+      modalOpen:!!s.modal, closeModal:this.closeModal,
+      modalWidth: s.modal==='confirm'?'440px':'480px',
+      modalCreateProject:s.modal==='createProject', modalInvite:s.modal==='invite', modalConfirm:s.modal==='confirm',
+      createName:s.createName, onCreateName:this.onCreateName, submitCreateProject:this.submitCreateProject,
+      createSlug: s.createName.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'project-name',
+      createNameError: s.createTouched && !s.createName.trim(), createNameBorder: (s.createTouched && !s.createName.trim())?'#FDA29B':'#E4E7EC',
+      inviteEmail:s.inviteEmail, onInviteEmail:this.onInviteEmail, inviteRoles, submitInvite:this.submitInvite,
+      inviteEmailError: s.inviteTouched && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.inviteEmail), inviteEmailBorder: (s.inviteTouched && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.inviteEmail))?'#FDA29B':'#E4E7EC',
+      confirmTitle:cm.title, confirmBody:cm.body, confirmCta:cm.cta, submitConfirm:this.submitConfirm,
+
+      usageStats, usageLineWide:usgW.line, usageFillWide:usgW.fill, activityBars, auditEvents,
+      toastExport:()=>this.toast('success','Usage exported to CSV'),
+
+      usageLimits, plans, invoices,
+      toastUpgrade:()=>this.toast('info','Opening plan comparison'), toastCredits:()=>this.toast('info','Credit checkout coming soon'),
+
+      settingsTabs,
+      setOrg:s.settingsTab==='organization', setProfile:s.settingsTab==='profile', setSecurity:s.settingsTab==='security',
+      setApiKeys:s.settingsTab==='apikeys', setWebhooks:s.settingsTab==='webhooks', setNotify:s.settingsTab==='notifications', setSso:s.settingsTab==='sso',
+      sessions:this.sessions, apiKeys, webhooks:this.webhooks, notifyPrefs,
+      toastSessions:()=>this.toast('success','Other sessions signed out'), toastKeyGen:()=>this.toast('success','New API key generated'),
+      toastWebhook:()=>this.toast('success','Endpoint added'), toastSso:()=>this.toast('success','SSO configuration saved'),
+
+      toasts
+    };
+  }
+}
+</script>
+</body>
+</html>
