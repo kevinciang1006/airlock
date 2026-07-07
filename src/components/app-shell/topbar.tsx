@@ -43,9 +43,9 @@ export function Topbar({
         onClick={onOpenCmdk}
         className="flex h-[38px] max-w-[440px] flex-1 items-center gap-2.5 rounded-md border border-line bg-wash-hover px-3 text-[13.5px] text-faint hover:bg-wash-track"
       >
-        <Search className="h-4 w-4" />
-        <span className="flex-1 text-left">Search or jump to…</span>
-        <span className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-muted">
+        <Search className="h-4 w-4 flex-shrink-0" />
+        <span className="flex-1 truncate whitespace-nowrap text-left">Search or jump to…</span>
+        <span className="hidden flex-shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-muted sm:inline">
           ⌘K
         </span>
       </button>
