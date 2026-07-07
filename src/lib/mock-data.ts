@@ -34,6 +34,7 @@ export interface Kpi {
   value: string;
   delta: string;
   deltaDir: "up" | "down";
+  good: boolean;
   spark: number[];
 }
 
@@ -108,10 +109,10 @@ export const auditEvents: AuditEvent[] = [
 
 /** KPI cards; `spark` is a 0..1-ish series the sparkline turns into a path. */
 export const kpis: Kpi[] = [
-  { label: "Active this week", value: "3", delta: "+1", deltaDir: "up", spark: [4, 5, 4, 6, 7, 6, 8] },
-  { label: "Usage this month", value: "1.24M", delta: "+18%", deltaDir: "up", spark: [3, 4, 6, 5, 7, 8, 9] },
-  { label: "API keys", value: "5", delta: "+2", deltaDir: "up", spark: [1, 1, 2, 3, 3, 4, 5] },
-  { label: "Errors (24h)", value: "12", delta: "-38%", deltaDir: "down", spark: [9, 8, 7, 6, 5, 4, 3] },
+  { label: "Active this week", value: "3", delta: "+1", deltaDir: "up", good: true, spark: [4, 5, 4, 6, 7, 6, 8] },
+  { label: "Usage this month", value: "1.24M", delta: "+18%", deltaDir: "up", good: true, spark: [3, 4, 6, 5, 7, 8, 9] },
+  { label: "API keys", value: "5", delta: "+2", deltaDir: "up", good: true, spark: [1, 1, 2, 3, 3, 4, 5] },
+  { label: "Errors (24h)", value: "12", delta: "-38%", deltaDir: "down", good: true, spark: [9, 8, 7, 6, 5, 4, 3] },
 ];
 
 /** Area chart series — daily API requests over ~5 weeks. */
