@@ -128,3 +128,138 @@ export const usageBreakdown: UsageBreakdown[] = [
   { slug: "internal-tools", pct: 9, color: "#B54708" },
   { slug: "sandbox", pct: 4, color: "#98A2B3" },
 ];
+
+/* ============================ Usage / analytics ============================ */
+
+export const memberActivitySeries: number[] = [
+  8, 11, 9, 13, 12, 16, 14, 18, 15, 19, 22, 20, 24, 21, 26, 23, 28, 25, 30, 27, 32, 29,
+];
+
+export interface TopProject {
+  name: string;
+  slug: string;
+  requests: number;
+  pct: number;
+}
+
+export const topProjects: TopProject[] = [
+  { name: "Payments API", slug: "payments-api", requests: 521000, pct: 100 },
+  { name: "Web Dashboard", slug: "web-dashboard", requests: 334000, pct: 64 },
+  { name: "Data Pipeline", slug: "data-pipeline", requests: 223000, pct: 43 },
+  { name: "Internal Tools", slug: "internal-tools", requests: 111000, pct: 21 },
+  { name: "Sandbox", slug: "sandbox", requests: 49000, pct: 9 },
+];
+
+/* ============================ Billing ============================ */
+
+export interface Plan {
+  name: string;
+  price: string;
+  cadence: string;
+  features: string[];
+  current: boolean;
+  cta: string;
+}
+
+export interface UsageLimit {
+  label: string;
+  used: number;
+  limit: number;
+  unit: string;
+}
+
+export interface Invoice {
+  id: string;
+  date: string;
+  amount: string;
+  status: "paid" | "open";
+}
+
+export const currentPlan = { name: "Team", price: "$99", cadence: "per month", renewal: "Aug 1, 2026" };
+
+export const usageLimits: UsageLimit[] = [
+  { label: "API requests", used: 1_240_000, limit: 2_000_000, unit: "" },
+  { label: "Projects", used: 6, limit: 25, unit: "" },
+  { label: "Members", used: 3, limit: 15, unit: "" },
+  { label: "Storage", used: 42, limit: 100, unit: "GB" },
+];
+
+export const plans: Plan[] = [
+  {
+    name: "Starter",
+    price: "$0",
+    cadence: "/mo",
+    features: ["Up to 3 projects", "2 members", "100K requests / mo", "Community support"],
+    current: false,
+    cta: "Downgrade",
+  },
+  {
+    name: "Team",
+    price: "$99",
+    cadence: "/mo",
+    features: ["Up to 25 projects", "15 members", "2M requests / mo", "Audit log", "Priority support"],
+    current: true,
+    cta: "Current plan",
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    cadence: "",
+    features: ["Unlimited projects", "SSO / SAML & SCIM", "Unlimited requests", "SLA + dedicated support"],
+    current: false,
+    cta: "Contact sales",
+  },
+];
+
+export const invoices: Invoice[] = [
+  { id: "INV-2026-07", date: "Jul 1, 2026", amount: "$99.00", status: "open" },
+  { id: "INV-2026-06", date: "Jun 1, 2026", amount: "$99.00", status: "paid" },
+  { id: "INV-2026-05", date: "May 1, 2026", amount: "$99.00", status: "paid" },
+  { id: "INV-2026-04", date: "Apr 1, 2026", amount: "$99.00", status: "paid" },
+];
+
+export const paymentMethod = { brand: "Visa", last4: "4242", exp: "08 / 28" };
+export const creditBalance = { credits: 12_400, total: 20_000 };
+
+/* ============================ Settings ============================ */
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  prefix: string;
+  created: string;
+  lastUsed: string;
+}
+
+export interface Webhook {
+  id: string;
+  url: string;
+  events: string;
+  status: "active" | "disabled";
+}
+
+export interface Session {
+  id: string;
+  device: string;
+  location: string;
+  lastActive: string;
+  current: boolean;
+}
+
+export const apiKeys: ApiKey[] = [
+  { id: "k1", name: "Production", prefix: "acme_live_4f2a…9c1", created: "Jul 6, 2026", lastUsed: "3h ago" },
+  { id: "k2", name: "CI / CD", prefix: "acme_live_1b8e…7d2", created: "Jun 20, 2026", lastUsed: "1d ago" },
+  { id: "k3", name: "Local dev", prefix: "acme_test_9a0c…3f4", created: "Jun 2, 2026", lastUsed: "5d ago" },
+];
+
+export const webhooks: Webhook[] = [
+  { id: "w1", url: "https://api.acme.com/hooks/airlock", events: "project.*, member.*", status: "active" },
+  { id: "w2", url: "https://ops.acme.com/audit", events: "audit.*", status: "active" },
+  { id: "w3", url: "https://staging.acme.com/hooks", events: "project.create", status: "disabled" },
+];
+
+export const sessions: Session[] = [
+  { id: "s1", device: "Chrome · macOS", location: "San Francisco, US", lastActive: "now", current: true },
+  { id: "s2", device: "Safari · iPhone", location: "San Francisco, US", lastActive: "2h ago", current: false },
+  { id: "s3", device: "Firefox · Windows", location: "Austin, US", lastActive: "3d ago", current: false },
+];
