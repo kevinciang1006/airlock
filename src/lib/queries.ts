@@ -35,9 +35,19 @@ export async function getSessionUser(): Promise<User | null> {
 /** Orgs the current user belongs to, with their role. RLS-scoped. */
 export async function getUserOrgs(): Promise<UserOrg[]> {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // Filter to the CURRENT user's memberships. The memberships RLS policy
+  // (is_org_member) intentionally exposes every member of your orgs so the
+  // Members page works — so without this eq() an org would appear once per
+  // co-member (and show a co-member's role). Scope to auth.uid() → one row/org.
   const { data: memberships, error } = await supabase
     .from("memberships")
     .select("org_id, role, created_at")
+    .eq("user_id", user.id)
     .order("created_at", { ascending: true });
   if (error || !memberships || memberships.length === 0) return [];
 
