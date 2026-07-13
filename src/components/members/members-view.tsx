@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Lock } from "lucide-react";
 import type { OrgRole } from "@/lib/database.types";
 import { Avatar } from "@/components/primitives/avatar";
 import { RoleBadge } from "@/components/primitives/role-badge";
@@ -29,10 +29,12 @@ export function MembersView({
   members,
   orgName,
   canInvite,
+  currentRole,
 }: {
   members: MemberDisplay[];
   orgName: string;
   canInvite: boolean;
+  currentRole: OrgRole;
 }) {
   const [search, setSearch] = React.useState("");
   const [inviteOpen, setInviteOpen] = React.useState(false);
@@ -54,10 +56,20 @@ export function MembersView({
             {members.length} {members.length === 1 ? "member" : "members"} in {orgName}
           </p>
         </div>
-        {canInvite && (
+        {canInvite ? (
           <Button onClick={() => setInviteOpen(true)}>
             <Plus className="h-4 w-4" /> Invite member
           </Button>
+        ) : (
+          <span
+            title="Only owners and admins can invite members"
+            className="inline-flex flex-col items-end gap-1"
+          >
+            <Button disabled>
+              <Lock className="h-3.5 w-3.5" /> Invite member
+            </Button>
+            <span className="text-[11px] text-faint">Owners &amp; admins only</span>
+          </span>
         )}
       </div>
 
@@ -117,7 +129,7 @@ export function MembersView({
         </div>
       </div>
 
-      <PermissionsMatrix />
+      <PermissionsMatrix currentRole={currentRole} />
 
       <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
     </div>

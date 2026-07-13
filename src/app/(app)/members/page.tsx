@@ -15,6 +15,11 @@ export default async function MembersPage() {
   }));
 
   return (
-    <MembersView members={display} orgName={activeOrg.name} canInvite={activeOrg.role !== "member"} />
+    <MembersView
+      members={display}
+      orgName={activeOrg.name}
+      canInvite={activeOrg.role !== "member"}
+      currentRole={activeOrg.role}
+    />
   );
 }

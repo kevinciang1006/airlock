@@ -19,6 +19,7 @@ import {
 import { switchOrg, toggleSidebar } from "@/app/actions";
 import type { UserOrg } from "@/lib/queries";
 import { Avatar } from "@/components/primitives/avatar";
+import { RoleBadge } from "@/components/primitives/role-badge";
 import { CreateOrgDialog } from "./create-org-dialog";
 import { cn } from "@/lib/utils";
 import {
@@ -90,7 +91,13 @@ export function Sidebar({
                 <>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13.5px] font-semibold text-ink">{activeOrg.name}</div>
-                    <div className="font-mono text-[11px] text-muted">{activeOrg.slug}</div>
+                    <div className="mt-0.5 flex items-center gap-1.5">
+                      <span className="font-mono text-[11px] text-muted">{activeOrg.slug}</span>
+                      <RoleBadge
+                        role={activeOrg.role}
+                        className="px-1.5 py-0 text-[9.5px] uppercase tracking-wide"
+                      />
+                    </div>
                   </div>
                   <ChevronsUpDown className="h-4 w-4 flex-shrink-0 text-faint" />
                 </>

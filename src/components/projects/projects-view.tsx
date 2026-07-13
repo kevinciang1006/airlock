@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search, Plus, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Plus, ArrowUp, ArrowDown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/primitives/avatar";
 import { StatusBadge, type ProjectStatus } from "@/components/primitives/status-badge";
@@ -252,10 +252,16 @@ function TableView(props: {
           <Button size="sm" variant="secondary" onClick={props.onBulkArchive}>
             Archive
           </Button>
-          {props.canDelete && (
+          {props.canDelete ? (
             <Button size="sm" variant="danger" onClick={props.onBulkDelete}>
               Delete
             </Button>
+          ) : (
+            <span title="Only owners and admins can delete projects" className="inline-flex">
+              <Button size="sm" variant="danger" disabled>
+                <Lock className="h-3.5 w-3.5" /> Delete
+              </Button>
+            </span>
           )}
           <button
             onClick={props.onClearSelection}
