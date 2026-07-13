@@ -15,7 +15,7 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn("fixed inset-0 z-50 bg-[rgba(16,25,42,.45)] data-[state=open]:animate-fadein", className)}
+    className={cn("fixed inset-0 z-[80] bg-[rgba(16,25,42,.45)] data-[state=open]:animate-fadein", className)}
     {...props}
   />
 ));
@@ -30,7 +30,8 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 w-[calc(100%-32px)] max-w-[460px] -translate-x-1/2 -translate-y-1/2",
+        // z-[80] to sit above the sidebar (z-[70], a stacking-context flex item).
+        "fixed left-1/2 top-1/2 z-[80] w-[calc(100%-32px)] max-w-[460px] -translate-x-1/2 -translate-y-1/2",
         "rounded-lg border border-line bg-surface p-5 shadow-drawer data-[state=open]:animate-pop",
         className,
       )}

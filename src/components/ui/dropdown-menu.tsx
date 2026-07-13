@@ -19,7 +19,10 @@ const DropdownMenuContent = React.forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-[220px] rounded-lg border border-line bg-surface p-1.5 shadow-dropdown",
+        // z-[80]: above the sidebar (z-[70]), which is a flex item whose z-index
+        // creates a stacking context even though it's position:static — so a z-50
+        // menu would render BEHIND the sidebar. Below palette (z-[90]) / toasts (z-[100]).
+        "z-[80] min-w-[220px] rounded-lg border border-line bg-surface p-1.5 shadow-dropdown",
         "data-[state=open]:animate-pop",
         className,
       )}
