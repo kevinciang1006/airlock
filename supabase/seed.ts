@@ -31,15 +31,30 @@ async function getOrCreateUser(email: string, fullName: string): Promise<string>
   const { data: list, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (error) throw error;
   const existing = list.users.find((u) => u.email === email);
-  if (existing) return existing.id;
-  const { data, error: cErr } = await admin.auth.admin.createUser({
-    email,
-    password: PASSWORD,
-    email_confirm: true,
-    user_metadata: { full_name: fullName },
-  });
-  if (cErr || !data.user) throw new Error(`create user ${email}: ${cErr?.message}`);
-  return data.user.id;
+  let id: string;
+  if (existing) {
+    id = existing.id;
+  } else {
+    const { data, error: cErr } = await admin.auth.admin.createUser({
+      email,
+      password: PASSWORD,
+      email_confirm: true,
+      user_metadata: { full_name: fullName },
+    });
+    if (cErr || !data.user) throw new Error(`create user ${email}: ${cErr?.message}`);
+    id = data.user.id;
+  }
+
+  // Guarantee a profile row. The handle_new_user trigger normally does this on
+  // insert, but a user created BEFORE 0004_profiles was applied (or before the
+  // trigger existed) would have no profile — so the members list / project
+  // owners would render as "Unknown". This idempotent upsert closes that gap.
+  const { error: pErr } = await admin
+    .from("profiles")
+    .upsert({ id, email, full_name: fullName }, { onConflict: "id" });
+  if (pErr) throw new Error(`upsert profile ${email}: ${pErr.message}`);
+
+  return id;
 }
 
 async function signedInClient(email: string): Promise<SupabaseClient<Database>> {
