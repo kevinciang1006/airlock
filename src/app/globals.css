@@ -120,6 +120,43 @@ a:hover {
   }
 }
 
+/* Skeleton fill for loading.tsx route fallbacks. Unlike .skel it sets no
+   border-radius, so callers control rounding via Tailwind (rounded-md /
+   rounded-full) and twMerge resolves it cleanly. */
+.shimmer {
+  background: linear-gradient(90deg, #eef0f3 25%, #f6f7f9 37%, #eef0f3 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+/* Indeterminate top progress bar, shown while a route segment is loading.
+   z above toasts (100) — it's a global navigation indicator. */
+.route-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2.5px;
+  z-index: 200;
+  overflow: hidden;
+  background: var(--accent-tint);
+}
+.route-progress::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 45%;
+  background: var(--accent);
+  animation: routebar 1.05s ease-in-out infinite;
+}
+@keyframes routebar {
+  0% {
+    left: -45%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
