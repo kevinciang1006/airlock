@@ -25,12 +25,18 @@ export async function authAction(_prev: AuthState, formData: FormData): Promise<
     const fullName = String(formData.get("name") ?? "").trim();
     if (!email || !password) return { error: "Email and password are required." };
     if (password.length < 6) return { error: "Password must be at least 6 characters." };
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName }, emailRedirectTo: `${siteUrl()}/auth/callback` },
     });
     if (error) return { error: error.message };
+    // Shared Supabase project: no auth.users trigger, so create the profile here.
+    if (data.user && data.session) {
+      await supabase
+        .from("airlock_profiles")
+        .upsert({ id: data.user.id, email, full_name: fullName || null }, { onConflict: "id" });
+    }
     redirect("/");
   }
 

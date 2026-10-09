@@ -10,26 +10,9 @@ create table airlock_profiles (
   created_at timestamptz not null default now()
 );
 
--- Populate/refresh a profile whenever an auth user is created.
-create or replace function public.airlock_handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  insert into public.airlock_profiles (id, email, full_name)
-  values (new.id, new.email, new.raw_user_meta_data->>'full_name')
-  on conflict (id) do update
-    set email = excluded.email,
-        full_name = coalesce(excluded.full_name, public.airlock_profiles.full_name);
-  return new;
-end;
-$$;
-
-create trigger airlock_on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.airlock_handle_new_user();
+-- No trigger on auth.users: this runs in a shared Supabase project, so we
+-- don't attach anything to the shared auth table. The seed script upserts
+-- airlock_profiles rows for the demo accounts instead.
 
 -- SECURITY DEFINER helper: do auth.uid() and target_user share any org?
 -- Bypasses airlock_memberships RLS internally to avoid policy recursion.
@@ -56,3 +39,6 @@ create policy "airlock_profiles_select_shared_org" on airlock_profiles
 
 create policy "airlock_profiles_update_self" on airlock_profiles
   for update using (id = auth.uid()) with check (id = auth.uid());
+
+create policy "airlock_profiles_insert_self" on airlock_profiles
+  for insert with check (id = auth.uid());
