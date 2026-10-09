@@ -115,11 +115,11 @@ npm run test:isolation
 
 | Email | Role | Org |
 |---|---|---|
-| `owner@acme.test` | owner | Acme Inc (`acme`) |
-| `owner@globex.test` | owner | Globex Corp (`globex`) |
-| `member@acme.test` | member | Acme Inc (`acme`) |
+| `demo@airlock.dev` | owner | Acme Inc (`acme`) |
+| `globex@airlock.dev` | owner | Globex Corp (`globex`) |
+| `member@airlock.dev` | member | Acme Inc (`acme`) |
 
-Password for all: `Password123!` (also shown, with copy buttons, on the login page). Log in as Acme, then Globex — neither sees the other's projects.
+Password for all: `AirlockDemo123!` (also shown, with copy buttons, on the login page). Log in as Acme, then Globex — neither sees the other's projects.
 
 ## Which screens are real vs mock
 

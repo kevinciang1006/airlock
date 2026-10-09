@@ -58,13 +58,13 @@ beforeAll(async () => {
 
 afterAll(async () => {
   // Delete orgs first (cascades projects + memberships), then users.
-  await adminClient().from("organizations").delete().in("id", [acmeOrg?.id, globexOrg?.id].filter(Boolean));
+  await adminClient().from("airlock_organizations").delete().in("id", [acmeOrg?.id, globexOrg?.id].filter(Boolean));
   await deleteUsers([userA?.id, userB?.id, memberM?.id].filter(Boolean) as string[]);
 });
 
 describe("tenant isolation", () => {
   it("1. A's projects select returns only Acme rows", async () => {
-    const { data, error } = await clientA.from("projects").select("*");
+    const { data, error } = await clientA.from("airlock_projects").select("*");
     expect(error).toBeNull();
     expect(data).not.toBeNull();
     for (const p of data ?? []) expect(p.org_id).toBe(acmeOrg.id);
@@ -74,27 +74,27 @@ describe("tenant isolation", () => {
   });
 
   it("2. A cannot select Globex's organization (empty, not error)", async () => {
-    const { data, error } = await clientA.from("organizations").select("*").eq("id", globexOrg.id);
+    const { data, error } = await clientA.from("airlock_organizations").select("*").eq("id", globexOrg.id);
     expect(error).toBeNull();
     expect(data).toEqual([]);
   });
 
   it("3. A cannot select Globex's memberships (empty)", async () => {
-    const { data, error } = await clientA.from("memberships").select("*").eq("org_id", globexOrg.id);
+    const { data, error } = await clientA.from("airlock_memberships").select("*").eq("org_id", globexOrg.id);
     expect(error).toBeNull();
     expect(data).toEqual([]);
   });
 
   it("4. A insert into projects with org_id = Globex is rejected (WITH CHECK)", async () => {
     const { error } = await clientA
-      .from("projects")
+      .from("airlock_projects")
       .insert({ org_id: globexOrg.id, name: "intrusion", created_by: userA.id });
     expect(error).not.toBeNull();
   });
 
   it("5. A update of a Globex project affects 0 rows", async () => {
     const { data, error } = await clientA
-      .from("projects")
+      .from("airlock_projects")
       .update({ name: "hacked" })
       .eq("id", globexProject.id)
       .select();
@@ -102,7 +102,7 @@ describe("tenant isolation", () => {
     expect(data).toEqual([]);
     // ground truth: the name is unchanged
     const { data: truth } = await adminClient()
-      .from("projects")
+      .from("airlock_projects")
       .select("name")
       .eq("id", globexProject.id)
       .maybeSingle();
@@ -110,11 +110,11 @@ describe("tenant isolation", () => {
   });
 
   it("6. A delete of a Globex project affects 0 rows and it still exists", async () => {
-    const { data, error } = await clientA.from("projects").delete().eq("id", globexProject.id).select();
+    const { data, error } = await clientA.from("airlock_projects").delete().eq("id", globexProject.id).select();
     expect(error).toBeNull();
     expect(data).toEqual([]);
     const { data: truth } = await adminClient()
-      .from("projects")
+      .from("airlock_projects")
       .select("id")
       .eq("id", globexProject.id)
       .maybeSingle();
@@ -124,7 +124,7 @@ describe("tenant isolation", () => {
   it("7. Positive control: A can fully CRUD within Acme", async () => {
     // create
     const { data: created, error: cErr } = await clientA
-      .from("projects")
+      .from("airlock_projects")
       .insert({ org_id: acmeOrg.id, name: "Acme Temp", created_by: userA.id })
       .select()
       .single();
@@ -133,29 +133,29 @@ describe("tenant isolation", () => {
     const id = created!.id;
 
     // read (visible in A's scoped list)
-    const { data: list } = await clientA.from("projects").select("id").eq("id", id);
+    const { data: list } = await clientA.from("airlock_projects").select("id").eq("id", id);
     expect((list ?? []).map((p) => p.id)).toContain(id);
 
     // update
-    const { data: upd } = await clientA.from("projects").update({ name: "Acme Temp 2" }).eq("id", id).select();
+    const { data: upd } = await clientA.from("airlock_projects").update({ name: "Acme Temp 2" }).eq("id", id).select();
     expect(upd?.length).toBe(1);
 
     // delete (A is owner)
-    const { data: del } = await clientA.from("projects").delete().eq("id", id).select();
+    const { data: del } = await clientA.from("airlock_projects").delete().eq("id", id).select();
     expect(del?.length).toBe(1);
   });
 
   it("8. Role control: a member cannot DELETE; an owner can", async () => {
     // member M attempts to delete an Acme project → blocked by has_org_role
     const { data: mDel, error: mErr } = await clientM
-      .from("projects")
+      .from("airlock_projects")
       .delete()
       .eq("id", acmeProject.id)
       .select();
     expect(mErr).toBeNull();
     expect(mDel).toEqual([]);
     const { data: stillThere } = await adminClient()
-      .from("projects")
+      .from("airlock_projects")
       .select("id")
       .eq("id", acmeProject.id)
       .maybeSingle();
@@ -163,7 +163,7 @@ describe("tenant isolation", () => {
 
     // owner A can delete a throwaway Acme project
     const throwaway = await addProjectAs(clientA, acmeOrg.id, userA.id, "Acme Disposable");
-    const { data: aDel } = await clientA.from("projects").delete().eq("id", throwaway.id).select();
+    const { data: aDel } = await clientA.from("airlock_projects").delete().eq("id", throwaway.id).select();
     expect(aDel?.length).toBe(1);
   });
 });
