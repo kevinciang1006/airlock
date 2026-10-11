@@ -12,6 +12,8 @@ The SQL migrations, the RLS policies, and the isolation tests are the product. T
 
 ## Tenancy model
 
+The live demo shares one Supabase project with other demos, so every table, function and policy is prefixed `airlock_` (e.g. `airlock_organizations`, `airlock_is_org_member`). Names below drop the prefix for readability.
+
 - **Tenant = `organization`.** Users join organizations through **`memberships`** (each with a `role`: `owner` / `admin` / `member`). Every org-scoped resource (here, `projects`) carries an **`org_id`**.
 - **The database is the security boundary.** The client never decides what it can see — Postgres does, via Row-Level Security. The app carries the user's session into every query (`@supabase/ssr`), so each query runs _as that user_ and RLS filters it. There is **no client-side authorization** standing in for the database; UI role-gating is UX only.
 
