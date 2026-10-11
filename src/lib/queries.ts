@@ -45,14 +45,14 @@ export async function getUserOrgs(): Promise<UserOrg[]> {
   // Members page works — so without this eq() an org would appear once per
   // co-member (and show a co-member's role). Scope to auth.uid() → one row/org.
   const { data: memberships, error } = await supabase
-    .from("memberships")
+    .from("airlock_memberships")
     .select("org_id, role, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
   if (error || !memberships || memberships.length === 0) return [];
 
   const orgIds = memberships.map((m) => m.org_id);
-  const { data: orgs } = await supabase.from("organizations").select("id, name, slug").in("id", orgIds);
+  const { data: orgs } = await supabase.from("airlock_organizations").select("id, name, slug").in("id", orgIds);
   const orgById = new Map((orgs ?? []).map((o) => [o.id, o]));
 
   const result: UserOrg[] = [];
@@ -75,7 +75,7 @@ export async function resolveActiveOrg(): Promise<UserOrg | null> {
 export async function getProjects(orgId: string): Promise<Project[]> {
   const supabase = createClient();
   const { data } = await supabase
-    .from("projects")
+    .from("airlock_projects")
     .select("*")
     .eq("org_id", orgId)
     .order("created_at", { ascending: false });
@@ -85,7 +85,7 @@ export async function getProjects(orgId: string): Promise<Project[]> {
 /** A single project by id (RLS returns null if not visible to the user). */
 export async function getProject(id: string): Promise<Project | null> {
   const supabase = createClient();
-  const { data } = await supabase.from("projects").select("*").eq("id", id).maybeSingle();
+  const { data } = await supabase.from("airlock_projects").select("*").eq("id", id).maybeSingle();
   return data ?? null;
 }
 
@@ -93,7 +93,7 @@ export async function getProject(id: string): Promise<Project | null> {
 export async function getMembers(orgId: string): Promise<MemberRow[]> {
   const supabase = createClient();
   const { data: memberships } = await supabase
-    .from("memberships")
+    .from("airlock_memberships")
     .select("user_id, role, created_at")
     .eq("org_id", orgId)
     .order("created_at", { ascending: true });
@@ -101,7 +101,7 @@ export async function getMembers(orgId: string): Promise<MemberRow[]> {
 
   const userIds = memberships.map((m) => m.user_id);
   const { data: profiles } = await supabase
-    .from("profiles")
+    .from("airlock_profiles")
     .select("id, email, full_name")
     .in("id", userIds);
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
@@ -122,8 +122,8 @@ export async function getMembers(orgId: string): Promise<MemberRow[]> {
 export async function getOverviewCounts(orgId: string): Promise<OverviewCounts> {
   const supabase = createClient();
   const [{ count: projects }, { count: members }] = await Promise.all([
-    supabase.from("projects").select("id", { count: "exact", head: true }).eq("org_id", orgId),
-    supabase.from("memberships").select("id", { count: "exact", head: true }).eq("org_id", orgId),
+    supabase.from("airlock_projects").select("id", { count: "exact", head: true }).eq("org_id", orgId),
+    supabase.from("airlock_memberships").select("id", { count: "exact", head: true }).eq("org_id", orgId),
   ]);
   return { projects: projects ?? 0, members: members ?? 0 };
 }

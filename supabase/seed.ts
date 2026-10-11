@@ -6,7 +6,7 @@ import type { Database, OrgRole } from "../src/lib/database.types";
  * Seed script — creates two demo orgs with real logins.
  *
  * Uses the service role for user creation + membership seeding, but creates
- * orgs by SIGNING IN as each owner and calling the create_organization RPC —
+ * orgs by SIGNING IN as each owner and calling the airlock_create_organization RPC —
  * so the seed exercises the same RPC + RLS path a real user would. Idempotent:
  * safe to run repeatedly.
  */
@@ -14,7 +14,7 @@ import type { Database, OrgRole } from "../src/lib/database.types";
 const URL = required("NEXT_PUBLIC_SUPABASE_URL");
 const ANON = required("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 const SERVICE = required("SUPABASE_SERVICE_ROLE_KEY");
-const PASSWORD = "Password123!";
+const PASSWORD = "AirlockDemo123!";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -45,12 +45,12 @@ async function getOrCreateUser(email: string, fullName: string): Promise<string>
     id = data.user.id;
   }
 
-  // Guarantee a profile row. The handle_new_user trigger normally does this on
+  // Guarantee a profile row. The airlock_handle_new_user trigger normally does this on
   // insert, but a user created BEFORE 0004_profiles was applied (or before the
   // trigger existed) would have no profile — so the members list / project
   // owners would render as "Unknown". This idempotent upsert closes that gap.
   const { error: pErr } = await admin
-    .from("profiles")
+    .from("airlock_profiles")
     .upsert({ id, email, full_name: fullName }, { onConflict: "id" });
   if (pErr) throw new Error(`upsert profile ${email}: ${pErr.message}`);
 
@@ -65,11 +65,11 @@ async function signedInClient(email: string): Promise<SupabaseClient<Database>> 
 }
 
 async function ensureOrg(ownerEmail: string, name: string, slug: string): Promise<string> {
-  const { data: existing } = await admin.from("organizations").select("id").eq("slug", slug).maybeSingle();
+  const { data: existing } = await admin.from("airlock_organizations").select("id").eq("slug", slug).maybeSingle();
   if (existing) return existing.id;
   const client = await signedInClient(ownerEmail);
-  const { data, error } = await client.rpc("create_organization", { org_name: name, org_slug: slug });
-  if (error || !data) throw new Error(`create_organization ${slug}: ${error?.message}`);
+  const { data, error } = await client.rpc("airlock_create_organization", { org_name: name, org_slug: slug });
+  if (error || !data) throw new Error(`airlock_create_organization ${slug}: ${error?.message}`);
   return data.id;
 }
 
@@ -82,14 +82,14 @@ async function ensureProjects(
   const client = await signedInClient(ownerEmail);
   for (const p of projects) {
     const { data: existing } = await admin
-      .from("projects")
+      .from("airlock_projects")
       .select("id")
       .eq("org_id", orgId)
       .eq("name", p.name)
       .maybeSingle();
     if (existing) continue;
     const { error } = await client
-      .from("projects")
+      .from("airlock_projects")
       .insert({ org_id: orgId, name: p.name, description: p.description, created_by: ownerId });
     if (error) throw new Error(`insert project ${p.name}: ${error.message}`);
   }
@@ -97,33 +97,33 @@ async function ensureProjects(
 
 async function ensureMembership(orgId: string, userId: string, role: OrgRole): Promise<void> {
   const { data: existing } = await admin
-    .from("memberships")
+    .from("airlock_memberships")
     .select("id")
     .eq("org_id", orgId)
     .eq("user_id", userId)
     .maybeSingle();
   if (existing) return;
-  const { error } = await admin.from("memberships").insert({ org_id: orgId, user_id: userId, role });
+  const { error } = await admin.from("airlock_memberships").insert({ org_id: orgId, user_id: userId, role });
   if (error) throw new Error(`insert membership: ${error.message}`);
 }
 
 async function main() {
   console.log("Seeding Airlock demo data…");
 
-  const acmeOwnerId = await getOrCreateUser("owner@acme.test", "Ada Lovelace");
-  const globexOwnerId = await getOrCreateUser("owner@globex.test", "Grace Hopper");
-  const memberId = await getOrCreateUser("member@acme.test", "Marvin Minsky");
+  const acmeOwnerId = await getOrCreateUser("demo@airlock.dev", "Ada Lovelace");
+  const globexOwnerId = await getOrCreateUser("globex@airlock.dev", "Grace Hopper");
+  const memberId = await getOrCreateUser("member@airlock.dev", "Marvin Minsky");
 
-  const acmeOrgId = await ensureOrg("owner@acme.test", "Acme Inc", "acme");
-  const globexOrgId = await ensureOrg("owner@globex.test", "Globex Corp", "globex");
+  const acmeOrgId = await ensureOrg("demo@airlock.dev", "Acme Inc", "acme");
+  const globexOrgId = await ensureOrg("globex@airlock.dev", "Globex Corp", "globex");
 
-  await ensureProjects("owner@acme.test", acmeOwnerId, acmeOrgId, [
+  await ensureProjects("demo@airlock.dev", acmeOwnerId, acmeOrgId, [
     { name: "Payments API", description: "Core billing + payment orchestration service." },
     { name: "Web Dashboard", description: "Customer-facing analytics dashboard." },
     { name: "Data Pipeline", description: "ETL jobs feeding the warehouse." },
   ]);
 
-  await ensureProjects("owner@globex.test", globexOwnerId, globexOrgId, [
+  await ensureProjects("globex@airlock.dev", globexOwnerId, globexOrgId, [
     { name: "Growth Site", description: "Marketing site + lead capture." },
     { name: "Mobile App", description: "iOS / Android client." },
     { name: "Analytics Service", description: "Event ingestion + reporting." },
@@ -136,9 +136,9 @@ async function main() {
 
   Demo logins (password for all: ${PASSWORD})
   ------------------------------------------------
-  owner@acme.test     owner of Acme Inc   (acme)
-  owner@globex.test   owner of Globex Corp (globex)
-  member@acme.test    member of Acme Inc  (acme)
+  demo@airlock.dev     owner of Acme Inc   (acme)
+  globex@airlock.dev   owner of Globex Corp (globex)
+  member@airlock.dev    member of Acme Inc  (acme)
 
   Log in as Acme, then Globex — neither sees the other's projects.
 `);

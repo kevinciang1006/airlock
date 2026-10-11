@@ -64,10 +64,10 @@ export async function signIn(email: string, password: string): Promise<AnonClien
   return client;
 }
 
-/** Call the create_organization RPC as the given authed client. */
+/** Call the airlock_create_organization RPC as the given authed client. */
 export async function createOrgAs(client: AnonClient, name: string, slug: string): Promise<Organization> {
-  const { data, error } = await client.rpc("create_organization", { org_name: name, org_slug: slug });
-  if (error || !data) throw new Error(`create_organization(${slug}) failed: ${error?.message}`);
+  const { data, error } = await client.rpc("airlock_create_organization", { org_name: name, org_slug: slug });
+  if (error || !data) throw new Error(`airlock_create_organization(${slug}) failed: ${error?.message}`);
   return data as Organization;
 }
 
@@ -79,7 +79,7 @@ export async function addProjectAs(
   name: string,
 ): Promise<Project> {
   const { data, error } = await client
-    .from("projects")
+    .from("airlock_projects")
     .insert({ org_id: orgId, name, created_by: createdBy })
     .select()
     .single();
@@ -89,7 +89,7 @@ export async function addProjectAs(
 
 /** Seed a membership with the service role (bypasses RLS — setup only). */
 export async function addMembershipAdmin(orgId: string, userId: string, role: OrgRole): Promise<void> {
-  const { error } = await adminClient().from("memberships").insert({ org_id: orgId, user_id: userId, role });
+  const { error } = await adminClient().from("airlock_memberships").insert({ org_id: orgId, user_id: userId, role });
   if (error) throw new Error(`addMembershipAdmin failed: ${error.message}`);
 }
 

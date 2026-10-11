@@ -25,12 +25,18 @@ export async function authAction(_prev: AuthState, formData: FormData): Promise<
     const fullName = String(formData.get("name") ?? "").trim();
     if (!email || !password) return { error: "Email and password are required." };
     if (password.length < 6) return { error: "Password must be at least 6 characters." };
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName }, emailRedirectTo: `${siteUrl()}/auth/callback` },
     });
     if (error) return { error: error.message };
+    // Shared Supabase project: no auth.users trigger, so create the profile here.
+    if (data.user && data.session) {
+      await supabase
+        .from("airlock_profiles")
+        .upsert({ id: data.user.id, email, full_name: fullName || null }, { onConflict: "id" });
+    }
     redirect("/");
   }
 
@@ -86,7 +92,7 @@ export async function createOrg(_prev: AuthState, formData: FormData): Promise<A
   if (!name || !slug) return { error: "Organization name and slug are required." };
 
   const supabase = createClient();
-  const { data, error } = await supabase.rpc("create_organization", { org_name: name, org_slug: slug });
+  const { data, error } = await supabase.rpc("airlock_create_organization", { org_name: name, org_slug: slug });
   if (error || !data) return { error: error?.message ?? "Could not create organization." };
   setActiveOrgId(data.id);
   revalidatePath("/", "layout");
@@ -117,7 +123,7 @@ export async function createProject(_prev: AuthState, formData: FormData): Promi
 
   // RLS `with check (is_org_member(org_id))` is the real guard — we never trust
   // a client-supplied org_id.
-  const { error } = await supabase.from("projects").insert({
+  const { error } = await supabase.from("airlock_projects").insert({
     org_id: activeOrg.id,
     name,
     description: description || null,
@@ -133,7 +139,7 @@ export async function createProject(_prev: AuthState, formData: FormData): Promi
 export async function deleteProject(projectId: string): Promise<AuthState> {
   const supabase = createClient();
   // RLS `has_org_role(org_id, {owner,admin})` enforces the permission.
-  const { error } = await supabase.from("projects").delete().eq("id", projectId);
+  const { error } = await supabase.from("airlock_projects").delete().eq("id", projectId);
   if (error) return { error: error.message };
   revalidatePath("/projects");
   revalidatePath("/");
@@ -148,7 +154,7 @@ export async function updateProject(_prev: AuthState, formData: FormData): Promi
 
   const supabase = createClient();
   const { error } = await supabase
-    .from("projects")
+    .from("airlock_projects")
     .update({ name, description: description || null })
     .eq("id", id);
   if (error) return { error: error.message };

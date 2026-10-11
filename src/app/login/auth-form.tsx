@@ -55,7 +55,7 @@ export function AuthForm() {
             type="email"
             placeholder="you@company.com"
             autoComplete="email"
-            defaultValue="owner@acme.test"
+            defaultValue="demo@airlock.dev"
             required
           />
         </Field>
@@ -66,7 +66,7 @@ export function AuthForm() {
               type="password"
               placeholder="••••••••••••"
               autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              defaultValue="Password123!"
+              defaultValue="AirlockDemo123!"
               required
             />
           </Field>
