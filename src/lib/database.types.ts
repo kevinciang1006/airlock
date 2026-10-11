@@ -14,7 +14,7 @@ export type OrgRole = "owner" | "admin" | "member";
 export type Database = {
   public: {
     Tables: {
-      organizations: {
+      airlock_organizations: {
         Row: {
           id: string;
           name: string;
@@ -35,7 +35,7 @@ export type Database = {
         };
         Relationships: [];
       };
-      memberships: {
+      airlock_memberships: {
         Row: {
           id: string;
           org_id: string;
@@ -59,14 +59,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "memberships_org_id_fkey";
+            foreignKeyName: "airlock_memberships_org_id_fkey";
             columns: ["org_id"];
-            referencedRelation: "organizations";
+            referencedRelation: "airlock_organizations";
             referencedColumns: ["id"];
           },
         ];
       };
-      projects: {
+      airlock_projects: {
         Row: {
           id: string;
           org_id: string;
@@ -93,14 +93,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "projects_org_id_fkey";
+            foreignKeyName: "airlock_projects_org_id_fkey";
             columns: ["org_id"];
-            referencedRelation: "organizations";
+            referencedRelation: "airlock_organizations";
             referencedColumns: ["id"];
           },
         ];
       };
-      profiles: {
+      airlock_profiles: {
         Row: {
           id: string;
           email: string | null;
@@ -126,19 +126,19 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      is_org_member: {
+      airlock_is_org_member: {
         Args: { target_org: string };
         Returns: boolean;
       };
-      has_org_role: {
+      airlock_has_org_role: {
         Args: { target_org: string; roles: OrgRole[] };
         Returns: boolean;
       };
-      shares_org: {
+      airlock_shares_org: {
         Args: { target_user: string };
         Returns: boolean;
       };
-      create_organization: {
+      airlock_create_organization: {
         Args: { org_name: string; org_slug: string };
         Returns: {
           id: string;
@@ -149,7 +149,7 @@ export type Database = {
       };
     };
     Enums: {
-      org_role: OrgRole;
+      airlock_org_role: OrgRole;
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -158,7 +158,7 @@ export type Database = {
 };
 
 /* Convenience row aliases used across the app. */
-export type Organization = Database["public"]["Tables"]["organizations"]["Row"];
-export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
-export type Project = Database["public"]["Tables"]["projects"]["Row"];
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type Organization = Database["public"]["Tables"]["airlock_organizations"]["Row"];
+export type Membership = Database["public"]["Tables"]["airlock_memberships"]["Row"];
+export type Project = Database["public"]["Tables"]["airlock_projects"]["Row"];
+export type Profile = Database["public"]["Tables"]["airlock_profiles"]["Row"];

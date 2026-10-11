@@ -3,16 +3,16 @@ import { Logo } from "@/components/primitives/logo";
 import { CopyButton } from "@/components/primitives/copy-button";
 
 const DEMO = [
-  { label: "Acme (owner)", email: "owner@acme.test" },
-  { label: "Globex (owner)", email: "owner@globex.test" },
-  { label: "Acme (member)", email: "member@acme.test" },
+  { label: "Acme (owner)", email: "demo@airlock.dev" },
+  { label: "Globex (owner)", email: "globex@airlock.dev" },
+  { label: "Acme (member)", email: "member@airlock.dev" },
 ];
 
 function DemoCredentials() {
   return (
     <div className="mt-7 rounded-lg border border-line bg-wash-hover p-3.5">
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-faint">
-        Demo logins · password <span className="font-mono">Password123!</span>
+        Demo logins · password <span className="font-mono">AirlockDemo123!</span>
       </div>
       <div className="flex flex-col gap-1.5">
         {DEMO.map((c) => (
@@ -24,8 +24,8 @@ function DemoCredentials() {
         ))}
         <div className="flex items-center gap-2 text-[13px]">
           <span className="w-[104px] text-muted">Password</span>
-          <span className="flex-1 font-mono text-label">Password123!</span>
-          <CopyButton value="Password123!" />
+          <span className="flex-1 font-mono text-label">AirlockDemo123!</span>
+          <CopyButton value="AirlockDemo123!" />
         </div>
       </div>
     </div>
