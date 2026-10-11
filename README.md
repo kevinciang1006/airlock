@@ -1,12 +1,12 @@
 # Airlock — Multi-Tenant Supabase RLS Starter
 
-[![CI](https://github.com/OWNER/airlock/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/airlock/actions/workflows/ci.yml)
+[![CI](https://github.com/kevinciang1006/airlock/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinciang1006/airlock/actions/workflows/ci.yml)
 
-> A production-grade, reusable multi-tenant SaaS reference on **Next.js 14 + Supabase**, whose defining feature is **database-enforced tenant isolation** — proven by a written isolation test suite that fails loudly if cross-tenant data could ever leak, and gated in CI on every push.
+**Live:** https://airlock.kevinciang.com (demo logins below)
+
+> A multi-tenant SaaS reference implementation on **Next.js 14 + Supabase**, whose defining feature is **database-enforced tenant isolation** — proven by a written isolation test suite that fails loudly if cross-tenant data could ever leak, and gated in CI on every push.
 
 The SQL migrations, the RLS policies, and the isolation tests are the product. The UI (a full ops console) exists to make the isolation _visible_ — log in as one org, then another, and watch that neither ever sees the other's data.
-
-> Replace `OWNER` in the badge URL above with your GitHub org/user once pushed.
 
 ---
 
@@ -120,6 +120,13 @@ npm run test:isolation
 | `member@acme.test` | member | Acme Inc (`acme`) |
 
 Password for all: `Password123!` (also shown, with copy buttons, on the login page). Log in as Acme, then Globex — neither sees the other's projects.
+
+## What this demo does not do
+
+- **No billing or payments.** The Billing and Usage screens are mock UI from `src/lib/mock-data.ts`; nothing charges or meters.
+- **Invitations don't send anything.** The invite dialog only shows a confirmation toast; no email goes out and no membership is created.
+- **No real audit log.** The audit log and the overview activity feed are mock events.
+- **Settings are mostly UI.** API keys, webhooks, SSO and 2FA in Settings are mock; only the wired screens listed below talk to Supabase.
 
 ## Which screens are real vs mock
 
